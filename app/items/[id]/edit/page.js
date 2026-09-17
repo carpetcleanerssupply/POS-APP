@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import ItemForm from "../../ItemForm";
@@ -13,7 +14,7 @@ export default async function EditItemPage({ params, searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 640 }}>
-      <p><a href="/items">&larr; Back to Items</a></p>
+      <p><Link href="/items">&larr; Back to Items</Link></p>
       <h1>Edit Item</h1>
       <ItemForm action={`/api/items/${id}`} item={item} error={query?.error} submitLabel="Save Changes" />
     </main>

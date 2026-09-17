@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -61,7 +62,7 @@ export default async function CustomerStatementPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p className="no-print"><a href={`/customers/${id}/edit`}>&larr; Back to {name}</a></p>
+      <p className="no-print"><Link href={`/customers/${id}/edit`}>&larr; Back to {name}</Link></p>
       <h1>Account Statement — {name}</h1>
       <p>
         Current Balance:{" "}

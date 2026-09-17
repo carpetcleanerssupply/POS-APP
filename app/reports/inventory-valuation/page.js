@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -31,10 +32,10 @@ export default async function InventoryValuationPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/admin">&larr; Admin</a></p>
+      <p><Link href="/admin">&larr; Admin</Link></p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Inventory Valuation</h1>
-        <a href="/api/reports/inventory-valuation/export">Export CSV</a>
+        <Link href="/api/reports/inventory-valuation/export">Export CSV</Link>
       </div>
       <p style={{ fontWeight: 700 }}>
         Total: ${grandTotal.toFixed(2)} across {grandUnits} unit{grandUnits === 1 ? "" : "s"}

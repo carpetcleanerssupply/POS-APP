@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -15,7 +16,7 @@ export default async function NewPaymentPage({ searchParams }) {
     const customers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-        <p><a href="/payments">&larr; Back to Payments</a></p>
+        <p><Link href="/payments">&larr; Back to Payments</Link></p>
         <h1>Record a Payment</h1>
         <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
           <select name="customerId" style={{ padding: "0.5rem", flex: 1 }}>
@@ -33,7 +34,7 @@ export default async function NewPaymentPage({ searchParams }) {
   if (!customer) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That customer no longer exists. <a href="/payments/new">Choose another</a>.</p>
+        <p>That customer no longer exists. <Link href="/payments/new">Choose another</Link>.</p>
       </main>
     );
   }
@@ -58,7 +59,7 @@ export default async function NewPaymentPage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 680 }}>
-      <p><a href="/payments">&larr; Back to Payments</a></p>
+      <p><Link href="/payments">&larr; Back to Payments</Link></p>
       <h1>Record a Payment — {displayName(customer)}</h1>
       <PaymentForm
         customer={{ id: customer.id, balance: Number(customer.balance) }}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -24,10 +25,10 @@ export default async function ARAgingPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/admin">&larr; Admin</a></p>
+      <p><Link href="/admin">&larr; Admin</Link></p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>A/R Aging</h1>
-        <a href="/api/reports/ar-aging/export">Export CSV</a>
+        <Link href="/api/reports/ar-aging/export">Export CSV</Link>
       </div>
 
       {rows.length === 0 ? (
@@ -48,7 +49,7 @@ export default async function ARAgingPage() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.customerId}>
-                <td style={tdLeft}><a href={`/customers/${r.customerId}/edit`}>{r.customerName}</a></td>
+                <td style={tdLeft}><Link href={`/customers/${r.customerId}/edit`}>{r.customerName}</Link></td>
                 <td style={td}>${r.current.toFixed(2)}</td>
                 <td style={td}>${r.d30.toFixed(2)}</td>
                 <td style={td}>${r.d60.toFixed(2)}</td>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import ReturnForm from "../ReturnForm";
@@ -18,7 +19,7 @@ export default async function NewReturnPage({ searchParams }) {
   if (!invoiceId) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 480 }}>
-        <p><a href="/returns">&larr; Back to Returns</a></p>
+        <p><Link href="/returns">&larr; Back to Returns</Link></p>
         <h1>Process a Return</h1>
         <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
           <input name="number" type="number" placeholder="Invoice #" style={{ padding: "0.5rem", flex: 1 }} />
@@ -33,7 +34,7 @@ export default async function NewReturnPage({ searchParams }) {
   if (!invoice || invoice.status !== "CLOSED") {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That invoice isn&apos;t available to return against. <a href="/returns/new">Choose another</a>.</p>
+        <p>That invoice isn&apos;t available to return against. <Link href="/returns/new">Choose another</Link>.</p>
       </main>
     );
   }
@@ -59,7 +60,7 @@ export default async function NewReturnPage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 680 }}>
-      <p><a href={`/invoices/${invoice.id}`}>&larr; Back to Invoice #{invoice.number}</a></p>
+      <p><Link href={`/invoices/${invoice.id}`}>&larr; Back to Invoice #{invoice.number}</Link></p>
       <h1>Process a Return — Invoice #{invoice.number}</h1>
       <p style={{ color: "#555" }}>{invoice.customerName}</p>
       <ReturnForm invoiceId={invoice.id} lines={lines} />

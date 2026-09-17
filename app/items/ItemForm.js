@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const ERROR_MESSAGES = {
   required: "SKU and Item Name are required.",
   duplicate_sku: "That SKU is already in use — SKUs must be unique.",
@@ -97,9 +99,9 @@ export default function ItemForm({ action, item, error, submitLabel }) {
           <button type="submit" style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
             {submitLabel}
           </button>
-          <a href="/items" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
+          <Link href="/items" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>
