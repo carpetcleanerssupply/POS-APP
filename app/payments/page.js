@@ -22,9 +22,12 @@ export default async function PaymentsPage() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Payments Register</h1>
-        <Link href="/payments/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-          + Record Payment
-        </Link>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <Link href="/api/payments/export">Export CSV</Link>
+          <Link href="/payments/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+            + Record Payment
+          </Link>
+        </div>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
