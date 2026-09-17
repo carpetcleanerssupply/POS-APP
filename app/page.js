@@ -17,10 +17,11 @@ export default async function Home() {
   const session = await requireSession();
   const owner = isOwnerManager(session);
 
-  const [accountInvoices, allItems, openPOCount, users, activityRaw] = await Promise.all([
+  const [accountInvoices, allItems, openPOCount, draftInvoiceCount, users, activityRaw] = await Promise.all([
     prisma.invoice.findMany({ where: { status: "CLOSED", settledTo: "ACCOUNT" } }),
     prisma.item.findMany(),
     prisma.purchaseOrder.count({ where: { status: { in: ["ORDERED", "PARTIAL"] } } }),
+    prisma.invoice.count({ where: { status: "DRAFT" } }),
     prisma.user.findMany({ orderBy: { name: "asc" } }),
     prisma.activityLog.findMany({ orderBy: { timestamp: "desc" }, take: 200, include: { user: true } }),
   ]);
@@ -87,6 +88,9 @@ export default async function Home() {
         <div style={tile}>
           <div style={tileLabel}>Open Purchase Orders</div>
           <div style={tileValue}>{openPOCount}</div>
+          {draftInvoiceCount > 0 && (
+            <div style={tileSub}>{draftInvoiceCount} invoice draft{draftInvoiceCount === 1 ? "" : "s"} pending too</div>
+          )}
         </div>
       </div>
 

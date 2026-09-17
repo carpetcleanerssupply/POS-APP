@@ -12,23 +12,40 @@ function currency(n) {
   return `$${Number(n).toFixed(2)}`;
 }
 
-export default function NewInvoiceForm({ items, customers, estimateId = null, initialCustomerId = null, initialLines = [] }) {
+export default function NewInvoiceForm({
+  items,
+  customers,
+  estimateId = null,
+  invoiceId = null,
+  initialCustomerId = null,
+  initialLines = [],
+  initialSaleType = "WALKIN",
+  initialCustomerPO = "",
+  initialShipVia = "",
+  initialTrackingNumber = "",
+  initialNotes = "",
+  initialShippingCharge = "0",
+  initialDueDate = "",
+}) {
   const router = useRouter();
   const [customerId, setCustomerId] = useState(initialCustomerId || "");
-  const [saleType, setSaleType] = useState("WALKIN");
-  const [customerPO, setCustomerPO] = useState("");
-  const [shipVia, setShipVia] = useState("");
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [notes, setNotes] = useState("");
-  const [shippingCharge, setShippingCharge] = useState("0");
+  const [saleType, setSaleType] = useState(initialSaleType);
+  const [customerPO, setCustomerPO] = useState(initialCustomerPO);
+  const [shipVia, setShipVia] = useState(initialShipVia);
+  const [trackingNumber, setTrackingNumber] = useState(initialTrackingNumber);
+  const [notes, setNotes] = useState(initialNotes);
+  const [shippingCharge, setShippingCharge] = useState(initialShippingCharge);
   const [lines, setLines] = useState(initialLines);
   const [pickerSku, setPickerSku] = useState("");
   const [settledTo, setSettledTo] = useState("PAID_NOW");
   const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [checkNumber, setCheckNumber] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState(initialDueDate);
+  const [depositAmount, setDepositAmount] = useState("");
+  const [depositMethod, setDepositMethod] = useState("CARD");
+  const [depositCheckNumber, setDepositCheckNumber] = useState("");
   const [error, setError] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(null); // null | "draft" | "close"
 
   const customer = customers.find((c) => c.id === customerId) || null;
   const itemsById = useMemo(() => Object.fromEntries(items.map((i) => [i.id, i])), [items]);
@@ -70,51 +87,82 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
     setLines((prev) => prev.filter((l) => l.itemId !== itemId));
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError(null);
+  const basePayload = {
+    customerId,
+    saleType,
+    customerPO,
+    shipVia,
+    trackingNumber,
+    notes,
+    shippingCharge: shipCharge,
+    lines: lines.map((l) => ({ itemId: l.itemId, qty: Number(l.qty) || 0, discountPct: l.discountPct, note: l.note })),
+    dueDate: settledTo === "ACCOUNT" ? dueDate || null : null,
+  };
 
+  async function saveDraft() {
+    setError(null);
     if (!customerId) return setError("Select a customer.");
     if (lines.length === 0) return setError("Add at least one line item.");
 
-    setSubmitting(true);
+    setSubmitting("draft");
     try {
-      const res = await fetch("/api/invoices", {
+      const res = await fetch(invoiceId ? `/api/invoices/${invoiceId}` : "/api/invoices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(invoiceId ? basePayload : { ...basePayload, saveAsDraft: true, estimateId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong saving this draft.");
+        setSubmitting(null);
+        return;
+      }
+      router.push(`/invoices/${invoiceId || data.id}`);
+    } catch {
+      setError("Network error — the draft was not saved.");
+      setSubmitting(null);
+    }
+  }
+
+  async function closeInvoice() {
+    setError(null);
+    if (!customerId) return setError("Select a customer.");
+    if (lines.length === 0) return setError("Add at least one line item.");
+
+    setSubmitting("close");
+    try {
+      const res = await fetch(invoiceId ? `/api/invoices/${invoiceId}/close` : "/api/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId,
-          saleType,
-          customerPO,
-          shipVia,
-          trackingNumber,
-          notes,
-          shippingCharge: shipCharge,
-          lines: lines.map((l) => ({ itemId: l.itemId, qty: Number(l.qty) || 0, discountPct: l.discountPct, note: l.note })),
+          ...basePayload,
           settledTo,
           paymentMethod,
           checkNumber,
-          dueDate: settledTo === "ACCOUNT" ? dueDate || null : null,
+          depositAmount: settledTo === "ACCOUNT" ? Number(depositAmount) || 0 : 0,
+          depositMethod,
+          depositCheckNumber,
           estimateId,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Something went wrong saving this invoice.");
-        setSubmitting(false);
+        setError(data.error || "Something went wrong closing this invoice.");
+        setSubmitting(null);
         return;
       }
-      router.push(`/invoices/${data.id}`);
-    } catch (err) {
+      router.push(`/invoices/${invoiceId || data.id}`);
+    } catch {
       setError("Network error — the invoice was not saved.");
-      setSubmitting(false);
+      setSubmitting(null);
     }
   }
 
   const isWalkInCustomer = Boolean(customer?.isWalkIn);
+  const depositTooBig = settledTo === "ACCOUNT" && Number(depositAmount) > total + 0.005;
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
       {error && (
         <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
       )}
@@ -319,16 +367,57 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
             </label>
           )}
         </div>
+
+        {settledTo === "ACCOUNT" && (
+          <div style={{ ...rowStyle, marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid #eee" }}>
+            <label style={labelStyle}>
+              Deposit Now (optional)
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                style={fieldStyle}
+              />
+              {depositTooBig && (
+                <span style={{ fontSize: "0.8rem", color: "#c62828" }}>Can&apos;t exceed the total.</span>
+              )}
+            </label>
+            {Number(depositAmount) > 0 && (
+              <>
+                <label style={labelStyle}>
+                  Deposit Method
+                  <select value={depositMethod} onChange={(e) => setDepositMethod(e.target.value)} style={fieldStyle}>
+                    <option value="CARD">Card</option>
+                    <option value="CHECK">Check</option>
+                    <option value="CASH">Cash</option>
+                  </select>
+                </label>
+                {depositMethod === "CHECK" && (
+                  <label style={labelStyle}>
+                    Deposit Check #
+                    <input value={depositCheckNumber} onChange={(e) => setDepositCheckNumber(e.target.value)} style={fieldStyle} />
+                  </label>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
-          {submitting ? "Saving..." : "Close Invoice"}
+        <button type="button" onClick={closeInvoice} disabled={!!submitting || depositTooBig} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+          {submitting === "close" ? "Saving..." : "Close Invoice"}
+        </button>
+        <button type="button" onClick={saveDraft} disabled={!!submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+          {submitting === "draft" ? "Saving..." : "Save as Draft"}
         </button>
         <a href="/invoices" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
           Cancel
         </a>
       </div>
-    </form>
+    </div>
   );
 }

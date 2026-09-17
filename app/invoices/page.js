@@ -41,7 +41,7 @@ export default async function InvoicesPage() {
               <td style={td}><a href={`/invoices/${inv.id}`}>{inv.number}</a></td>
               <td style={td}>{new Date(inv.date).toLocaleDateString()}</td>
               <td style={td}>{inv.customerName}</td>
-              <td style={td}>{inv.settledTo === "ACCOUNT" ? "Charged" : "Paid"}</td>
+              <td style={td}>{inv.status === "DRAFT" ? "Draft" : inv.settledTo === "ACCOUNT" ? "Charged" : "Paid"}</td>
               <td style={{ ...td, textAlign: "right" }}>${Number(inv.total).toFixed(2)}</td>
             </tr>
           ))}

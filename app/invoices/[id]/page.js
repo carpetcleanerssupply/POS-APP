@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import DeleteDraftButton from "../DeleteDraftButton";
 
 const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
 const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
@@ -15,6 +16,7 @@ export default async function InvoiceDetailPage({ params }) {
   });
   if (!invoice) notFound();
 
+  const isDraft = invoice.status === "DRAFT";
   const isAccount = invoice.settledTo === "ACCOUNT";
 
   return (
@@ -27,15 +29,21 @@ export default async function InvoiceDetailPage({ params }) {
           style={{
             padding: "0.3rem 0.7rem",
             borderRadius: 6,
-            background: isAccount ? "#fff3e0" : "#e8f5e9",
-            color: isAccount ? "#e65100" : "#2e7d32",
+            background: isDraft ? "#eee" : isAccount ? "#fff3e0" : "#e8f5e9",
+            color: isDraft ? "#555" : isAccount ? "#e65100" : "#2e7d32",
             fontWeight: 600,
             fontSize: "0.85rem",
           }}
         >
-          {isAccount ? "Charged to Account" : "Paid"}
+          {isDraft ? "Draft" : isAccount ? "Charged to Account" : "Paid"}
         </span>
       </div>
+
+      {isDraft && (
+        <p style={{ background: "#fff3e0", color: "#e65100", padding: "0.75rem 1rem", borderRadius: 8 }}>
+          This is a draft — nothing has been charged and stock hasn&apos;t been affected yet.
+        </p>
+      )}
 
       <p style={{ color: "#555" }}>
         {new Date(invoice.date).toLocaleString()} &middot; {invoice.saleType === "WALKIN" ? "Walk-in" : "Phone"} sale
@@ -77,15 +85,26 @@ export default async function InvoiceDetailPage({ params }) {
         <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: ${Number(invoice.total).toFixed(2)}</div>
       </div>
 
-      <p style={{ marginTop: "1rem", color: "#555" }}>
-        {isAccount
-          ? "Charged to customer account."
-          : `Paid via ${invoice.paymentMethod?.toLowerCase()}${invoice.checkNumber ? ` (check #${invoice.checkNumber})` : ""}.`}
-      </p>
+      {!isDraft && (
+        <p style={{ marginTop: "1rem", color: "#555" }}>
+          {isAccount
+            ? "Charged to customer account."
+            : `Paid via ${invoice.paymentMethod?.toLowerCase()}${invoice.checkNumber ? ` (check #${invoice.checkNumber})` : ""}.`}
+        </p>
+      )}
 
       <p style={{ display: "flex", gap: "1rem" }}>
-        <a href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</a>
-        {isAccount && <a href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</a>}
+        {isDraft ? (
+          <>
+            <a href={`/invoices/${invoice.id}/edit`}>Edit / Close Draft</a>
+            <DeleteDraftButton invoiceId={invoice.id} />
+          </>
+        ) : (
+          <>
+            <a href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</a>
+            {isAccount && <a href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</a>}
+          </>
+        )}
       </p>
 
       {invoice.notes && (
