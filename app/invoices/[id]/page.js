@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { formatAddress } from "@/lib/customers";
@@ -59,7 +60,7 @@ export default async function InvoiceDetailPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><a href="/invoices">&larr; Back to Invoices</a></p>
+      <p className="no-print"><Link href="/invoices">&larr; Back to Invoices</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Invoice #{invoice.number}</h1>
@@ -89,7 +90,7 @@ export default async function InvoiceDetailPage({ params }) {
       </p>
 
       <h3>{invoice.customerName}</h3>
-      {invoice.customer && <p className="no-print" style={{ color: "#555" }}><a href={`/customers/${invoice.customer.id}/edit`}>View customer</a></p>}
+      {invoice.customer && <p className="no-print" style={{ color: "#555" }}><Link href={`/customers/${invoice.customer.id}/edit`}>View customer</Link></p>}
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
         <thead>
@@ -136,13 +137,13 @@ export default async function InvoiceDetailPage({ params }) {
         <EmailButton mailtoUrl={emailMailto} />
         {isDraft ? (
           <>
-            <a href={`/invoices/${invoice.id}/edit`}>Edit / Close Draft</a>
+            <Link href={`/invoices/${invoice.id}/edit`}>Edit / Close Draft</Link>
             <DeleteDraftButton invoiceId={invoice.id} />
           </>
         ) : (
           <>
-            <a href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</a>
-            {isAccount && <a href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</a>}
+            <Link href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</Link>
+            {isAccount && <Link href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</Link>}
           </>
         )}
       </p>

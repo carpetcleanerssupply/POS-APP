@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -19,7 +20,7 @@ export default async function NewInvoicePage({ searchParams }) {
   if (estimateId && (!estimate || estimate.status !== "OPEN")) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That estimate isn&apos;t available to convert. <a href="/invoices/new">Start a blank invoice</a>.</p>
+        <p>That estimate isn&apos;t available to convert. <Link href="/invoices/new">Start a blank invoice</Link>.</p>
       </main>
     );
   }
@@ -41,17 +42,17 @@ export default async function NewInvoicePage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href="/invoices">&larr; Back to Invoices</a></p>
+      <p><Link href="/invoices">&larr; Back to Invoices</Link></p>
       <h1>New Invoice</h1>
       {plainCustomers.length === 0 ? (
         <p>
           You need at least one customer before creating an invoice.{" "}
-          <a href="/customers/new">Add a customer</a> first.
+          <Link href="/customers/new">Add a customer</Link> first.
         </p>
       ) : plainItems.length === 0 ? (
         <p>
           You need at least one item before creating an invoice.{" "}
-          <a href="/items/new">Add an item</a> first.
+          <Link href="/items/new">Add an item</Link> first.
         </p>
       ) : (
         <NewInvoiceForm

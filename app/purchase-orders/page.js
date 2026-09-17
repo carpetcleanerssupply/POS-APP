@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { poTotal } from "@/lib/purchaseOrders";
@@ -14,13 +15,13 @@ export default async function PurchaseOrdersPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Purchase Orders</h1>
-        <a href="/purchase-orders/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/purchase-orders/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + New PO
-        </a>
+        </Link>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
@@ -37,7 +38,7 @@ export default async function PurchaseOrdersPage() {
         <tbody>
           {pos.map((po) => (
             <tr key={po.id}>
-              <td style={td}><a href={`/purchase-orders/${po.id}`}>{po.number}</a></td>
+              <td style={td}><Link href={`/purchase-orders/${po.id}`}>{po.number}</Link></td>
               <td style={td}>{new Date(po.date).toLocaleDateString()}</td>
               <td style={td}>{po.vendorName}</td>
               <td style={td}>{STATUS_LABEL[po.status]}</td>

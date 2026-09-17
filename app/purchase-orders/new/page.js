@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import POForm from "../POForm";
@@ -16,12 +17,12 @@ export default async function NewPurchaseOrderPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href="/purchase-orders">&larr; Back to Purchase Orders</a></p>
+      <p><Link href="/purchase-orders">&larr; Back to Purchase Orders</Link></p>
       <h1>New Purchase Order</h1>
       {vendors.length === 0 ? (
-        <p>You need at least one vendor first. <a href="/vendors/new">Add a vendor</a>.</p>
+        <p>You need at least one vendor first. <Link href="/vendors/new">Add a vendor</Link>.</p>
       ) : plainItems.length === 0 ? (
-        <p>You need at least one item first. <a href="/items/new">Add an item</a>.</p>
+        <p>You need at least one item first. <Link href="/items/new">Add an item</Link>.</p>
       ) : (
         <POForm items={plainItems} vendors={vendors.map((v) => ({ id: v.id, name: v.name }))} />
       )}

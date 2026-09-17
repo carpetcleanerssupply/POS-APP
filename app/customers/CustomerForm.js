@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const ERROR_MESSAGES = {
   required: "Enter a company name or a contact name.",
 };
@@ -26,8 +28,8 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
       {customer && (
         <p style={{ color: "#555" }}>
           Balance: <strong>${Number(customer.balance).toFixed(2)}</strong>{" "}
-          <a href={`/payments/new?customerId=${customer.id}`}>Record Payment</a>{" "}
-          &middot; <a href={`/customers/${customer.id}/statement`}>Account Statement</a>
+          <Link href={`/payments/new?customerId=${customer.id}`}>Record Payment</Link>{" "}
+          &middot; <Link href={`/customers/${customer.id}/statement`}>Account Statement</Link>
         </p>
       )}
 
@@ -125,7 +127,7 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
           </label>
         </div>
         <p style={{ fontSize: "0.8rem", color: "#777", marginTop: "-0.5rem" }}>
-          If "Same as billing address" is checked, the shipping fields above are ignored and the billing address is
+          If &quot;Same as billing address&quot; is checked, the shipping fields above are ignored and the billing address is
           used instead.
         </p>
 
@@ -142,9 +144,9 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
           <button type="submit" style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
             {submitLabel}
           </button>
-          <a href="/customers" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
+          <Link href="/customers" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
             Cancel
-          </a>
+          </Link>
         </div>
       </form>
     </div>

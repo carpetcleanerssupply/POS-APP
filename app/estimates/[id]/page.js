@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { buildMailtoUrl } from "@/lib/mailto";
@@ -50,7 +51,7 @@ export default async function EstimateDetailPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><a href="/estimates">&larr; Back to Estimates</a></p>
+      <p className="no-print"><Link href="/estimates">&larr; Back to Estimates</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Estimate #{estimate.number}</h1>
@@ -118,12 +119,12 @@ export default async function EstimateDetailPage({ params }) {
         <EmailButton mailtoUrl={emailMailto} />
         {isConverted ? (
           estimate.convertedInvoice && (
-            <a href={`/invoices/${estimate.convertedInvoice.id}`}>View Invoice #{estimate.convertedInvoice.number}</a>
+            <Link href={`/invoices/${estimate.convertedInvoice.id}`}>View Invoice #{estimate.convertedInvoice.number}</Link>
           )
         ) : (
           <>
-            <a href={`/invoices/new?estimateId=${estimate.id}`}>Convert to Invoice</a>
-            <a href={`/estimates/${estimate.id}/edit`}>Edit</a>
+            <Link href={`/invoices/new?estimateId=${estimate.id}`}>Convert to Invoice</Link>
+            <Link href={`/estimates/${estimate.id}/edit`}>Edit</Link>
           </>
         )}
       </p>

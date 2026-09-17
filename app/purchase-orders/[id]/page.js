@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -45,7 +46,7 @@ export default async function PurchaseOrderDetailPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><a href="/purchase-orders">&larr; Back to Purchase Orders</a></p>
+      <p className="no-print"><Link href="/purchase-orders">&larr; Back to Purchase Orders</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>PO #{po.number}</h1>

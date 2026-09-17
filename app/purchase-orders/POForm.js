@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
 
@@ -176,7 +177,7 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
         <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
           {submitting ? "Saving..." : poId ? "Save Changes" : "Create Draft PO"}
         </button>
-        <a href="/purchase-orders" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>Cancel</a>
+        <Link href="/purchase-orders" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>Cancel</Link>
       </div>
     </form>
   );

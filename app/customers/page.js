@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -34,16 +35,16 @@ export default async function CustomersPage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Customers</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <a href="/api/customers/export">Export CSV</a>
-          <a href="/customers/import">Import CSV</a>
-          <a href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+          <Link href="/api/customers/export">Export CSV</Link>
+          <Link href="/customers/import">Import CSV</Link>
+          <Link href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Customer
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -77,12 +78,12 @@ export default async function CustomersPage({ searchParams }) {
         <tbody>
           {customers.map((c) => (
             <tr key={c.id}>
-              <td style={td}><a href={`/customers/${c.id}/edit`}>{displayName(c)}</a></td>
+              <td style={td}><Link href={`/customers/${c.id}/edit`}>{displayName(c)}</Link></td>
               <td style={td}>{c.cellPhone || c.workPhone || "—"}</td>
               <td style={td}>{c.email || "—"}</td>
               <td style={td}>${Number(c.balance).toFixed(2)}</td>
               <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                <a href={`/customers/${c.id}/edit`}>Edit</a>
+                <Link href={`/customers/${c.id}/edit`}>Edit</Link>
                 <DeleteCustomerButton customerId={c.id} customerName={displayName(c)} />
               </td>
             </tr>

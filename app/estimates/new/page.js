@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -17,10 +18,10 @@ export default async function NewEstimatePage({ searchParams }) {
     const customers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-        <p><a href="/estimates">&larr; Back to Estimates</a></p>
+        <p><Link href="/estimates">&larr; Back to Estimates</Link></p>
         <h1>New Estimate</h1>
         {customers.length === 0 ? (
-          <p>You need at least one customer first. <a href="/customers/new">Add a customer</a>.</p>
+          <p>You need at least one customer first. <Link href="/customers/new">Add a customer</Link>.</p>
         ) : (
           <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
             <select name="customerId" style={{ padding: "0.5rem", flex: 1 }}>
@@ -39,7 +40,7 @@ export default async function NewEstimatePage({ searchParams }) {
   if (!customer) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That customer no longer exists. <a href="/estimates/new">Choose another</a>.</p>
+        <p>That customer no longer exists. <Link href="/estimates/new">Choose another</Link>.</p>
       </main>
     );
   }
@@ -47,14 +48,14 @@ export default async function NewEstimatePage({ searchParams }) {
   if (plainItems.length === 0) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>You need at least one item first. <a href="/items/new">Add an item</a>.</p>
+        <p>You need at least one item first. <Link href="/items/new">Add an item</Link>.</p>
       </main>
     );
   }
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href="/estimates">&larr; Back to Estimates</a></p>
+      <p><Link href="/estimates">&larr; Back to Estimates</Link></p>
       <h1>New Estimate</h1>
       <EstimateForm items={plainItems} customer={{ id: customer.id, name: displayName(customer), taxExempt: customer.taxExempt }} />
     </main>

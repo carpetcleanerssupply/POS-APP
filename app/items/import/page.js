@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireSession } from "@/lib/auth";
 import { ITEM_CSV_FIELDS } from "@/lib/csv";
 import ImportCsvForm from "../../ImportCsvForm";
@@ -7,7 +8,7 @@ export default async function ImportItemsPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-      <p><a href="/items">&larr; Back to Items</a></p>
+      <p><Link href="/items">&larr; Back to Items</Link></p>
       <h1>Import Items</h1>
       <p style={{ color: "#555" }}>
         The CSV needs a header row with these exact column names (SKU and Item Name are required, the rest are
@@ -17,7 +18,7 @@ export default async function ImportItemsPage() {
         {ITEM_CSV_FIELDS.map((f) => f.label).join(", ")}
       </p>
       <p style={{ color: "#555" }}>
-        Exporting your current items first (<a href="/api/items/export">Export CSV</a>) gives you a file in exactly
+        Exporting your current items first (<Link href="/api/items/export">Export CSV</Link>) gives you a file in exactly
         this format to start from.
       </p>
       <ImportCsvForm action="/api/items/import" noun="item" />

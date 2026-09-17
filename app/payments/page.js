@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -17,13 +18,13 @@ export default async function PaymentsPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Payments Register</h1>
-        <a href="/payments/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/payments/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + Record Payment
-        </a>
+        </Link>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>

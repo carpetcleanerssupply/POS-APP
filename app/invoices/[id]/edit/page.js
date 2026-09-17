@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { displayName } from "@/lib/customers";
@@ -18,7 +19,7 @@ export default async function EditInvoiceDraftPage({ params }) {
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
         <p>
           This invoice is already closed and can&apos;t be edited.{" "}
-          <a href={`/invoices/${id}`}>View it</a>.
+          <Link href={`/invoices/${id}`}>View it</Link>.
         </p>
       </main>
     );
@@ -40,7 +41,7 @@ export default async function EditInvoiceDraftPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href="/invoices">&larr; Back to Invoices</a></p>
+      <p><Link href="/invoices">&larr; Back to Invoices</Link></p>
       <h1>Draft Invoice #{invoice.number}</h1>
       <NewInvoiceForm
         items={plainItems}

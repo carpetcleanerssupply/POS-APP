@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TAX_RATE, lineExt } from "@/lib/invoices";
 
 const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
@@ -198,9 +199,9 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
         <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
           {submitting ? "Saving..." : "Save Estimate"}
         </button>
-        <a href="/estimates" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
+        <Link href="/estimates" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
           Cancel
-        </a>
+        </Link>
       </div>
     </form>
   );

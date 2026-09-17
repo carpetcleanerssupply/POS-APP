@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import DeleteVendorButton from "./DeleteVendorButton";
@@ -24,16 +25,16 @@ export default async function VendorsPage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Vendors</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <a href="/api/vendors/export">Export CSV</a>
-          <a href="/vendors/import">Import CSV</a>
-          <a href="/vendors/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+          <Link href="/api/vendors/export">Export CSV</Link>
+          <Link href="/vendors/import">Import CSV</Link>
+          <Link href="/vendors/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Vendor
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -61,12 +62,12 @@ export default async function VendorsPage({ searchParams }) {
         <tbody>
           {vendors.map((v) => (
             <tr key={v.id}>
-              <td style={td}><a href={`/vendors/${v.id}/edit`}>{v.name}</a></td>
+              <td style={td}><Link href={`/vendors/${v.id}/edit`}>{v.name}</Link></td>
               <td style={td}>{v.contactName || "—"}</td>
               <td style={td}>{v.phone || "—"}</td>
               <td style={td}>{v.email || "—"}</td>
               <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                <a href={`/vendors/${v.id}/edit`}>Edit</a>
+                <Link href={`/vendors/${v.id}/edit`}>Edit</Link>
                 <DeleteVendorButton vendorId={v.id} vendorName={v.name} />
               </td>
             </tr>

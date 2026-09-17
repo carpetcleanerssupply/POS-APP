@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -49,7 +50,7 @@ export default async function Home() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <a href="/account">My Account</a>
+          <Link href="/account">My Account</Link>
           <form action="/api/auth/logout" method="POST">
             <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Sign out</button>
           </form>
@@ -57,15 +58,15 @@ export default async function Home() {
       </div>
 
       <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-        <a href="/items">Items</a>
-        <a href="/customers">Customers</a>
-        <a href="/invoices">Invoices</a>
-        <a href="/estimates">Estimates</a>
-        <a href="/payments">Payments</a>
-        <a href="/returns">Returns</a>
-        <a href="/vendors">Vendors</a>
-        <a href="/purchase-orders">Purchase Orders</a>
-        {owner && <a href="/admin">Admin</a>}
+        <Link href="/items">Items</Link>
+        <Link href="/customers">Customers</Link>
+        <Link href="/invoices">Invoices</Link>
+        <Link href="/estimates">Estimates</Link>
+        <Link href="/payments">Payments</Link>
+        <Link href="/returns">Returns</Link>
+        <Link href="/vendors">Vendors</Link>
+        <Link href="/purchase-orders">Purchase Orders</Link>
+        {owner && <Link href="/admin">Admin</Link>}
       </nav>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", margin: "1.5rem 0" }}>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 
@@ -12,13 +13,13 @@ export default async function EstimatesPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Estimates</h1>
-        <a href="/estimates/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/estimates/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + New Estimate
-        </a>
+        </Link>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
@@ -34,7 +35,7 @@ export default async function EstimatesPage() {
         <tbody>
           {estimates.map((e) => (
             <tr key={e.id}>
-              <td style={td}><a href={`/estimates/${e.id}`}>{e.number}</a></td>
+              <td style={td}><Link href={`/estimates/${e.id}`}>{e.number}</Link></td>
               <td style={td}>{new Date(e.date).toLocaleDateString()}</td>
               <td style={td}>{e.customerName}</td>
               <td style={td}>{e.status === "CONVERTED" ? "Converted" : "Open"}</td>

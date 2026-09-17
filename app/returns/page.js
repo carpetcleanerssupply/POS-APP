@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import VoidReturnButton from "./VoidReturnButton";
@@ -13,13 +14,13 @@ export default async function ReturnsPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Returns</h1>
-        <a href="/returns/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/returns/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + Process Return
-        </a>
+        </Link>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
@@ -40,7 +41,7 @@ export default async function ReturnsPage() {
               <td style={td}>{r.number}</td>
               <td style={td}>{new Date(r.date).toLocaleDateString()}</td>
               <td style={td}>{r.customerName}</td>
-              <td style={td}><a href={`/invoices/${r.originalInvoiceId}`}>#{r.originalInvoice?.number}</a></td>
+              <td style={td}><Link href={`/invoices/${r.originalInvoiceId}`}>#{r.originalInvoice?.number}</Link></td>
               <td style={td}>{r.refundMethod === "ACCOUNT" ? "Account Credit" : r.refundMethod}</td>
               <td style={{ ...td, textAlign: "right" }}>${Number(r.total).toFixed(2)}</td>
               <td style={td}>{r.voided ? "Voided" : <VoidReturnButton returnId={r.id} />}</td>

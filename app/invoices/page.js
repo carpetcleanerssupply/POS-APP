@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 
@@ -16,13 +17,13 @@ export default async function InvoicesPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Invoices</h1>
-        <a href="/invoices/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/invoices/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + New Invoice
-        </a>
+        </Link>
       </div>
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
@@ -38,7 +39,7 @@ export default async function InvoicesPage() {
         <tbody>
           {invoices.map((inv) => (
             <tr key={inv.id}>
-              <td style={td}><a href={`/invoices/${inv.id}`}>{inv.number}</a></td>
+              <td style={td}><Link href={`/invoices/${inv.id}`}>{inv.number}</Link></td>
               <td style={td}>{new Date(inv.date).toLocaleDateString()}</td>
               <td style={td}>{inv.customerName}</td>
               <td style={td}>{inv.status === "DRAFT" ? "Draft" : inv.settledTo === "ACCOUNT" ? "Charged" : "Paid"}</td>

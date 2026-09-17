@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isLowStock, lowStockThreshold } from "@/lib/items";
@@ -36,16 +37,16 @@ export default async function ItemsPage({ searchParams }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Items</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <a href="/api/items/export">Export CSV</a>
-          <a href="/items/import">Import CSV</a>
-          <a href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+          <Link href="/api/items/export">Export CSV</Link>
+          <Link href="/items/import">Import CSV</Link>
+          <Link href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Item
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -65,7 +66,7 @@ export default async function ItemsPage({ searchParams }) {
         />
         {lowOnly && <input type="hidden" name="low" value="1" />}
         <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Search</button>
-        <a
+        <Link
           href={lowOnly ? `/items${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/items?low=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
           style={{
             padding: "0.5rem 0.9rem",
@@ -78,7 +79,7 @@ export default async function ItemsPage({ searchParams }) {
           }}
         >
           {lowOnly ? "Showing Low Stock" : `⚠ ${lowStockCount} Low Stock`}
-        </a>
+        </Link>
       </form>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -110,7 +111,7 @@ export default async function ItemsPage({ searchParams }) {
                 )}
               </td>
               <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                <a href={`/items/${item.id}/edit`}>Edit</a>
+                <Link href={`/items/${item.id}/edit`}>Edit</Link>
                 <DeleteItemButton itemId={item.id} itemName={item.name} />
               </td>
             </tr>

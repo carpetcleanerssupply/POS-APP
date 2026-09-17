@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { TAX_RATE, lineExt } from "@/lib/invoices";
 
 const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
@@ -414,9 +415,9 @@ export default function NewInvoiceForm({
         <button type="button" onClick={saveDraft} disabled={!!submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
           {submitting === "draft" ? "Saving..." : "Save as Draft"}
         </button>
-        <a href="/invoices" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
+        <Link href="/invoices" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
           Cancel
-        </a>
+        </Link>
       </div>
     </div>
   );

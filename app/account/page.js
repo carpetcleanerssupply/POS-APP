@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireSession } from "@/lib/auth";
 import ChangePasswordForm from "./ChangePasswordForm";
 
@@ -6,7 +7,7 @@ export default async function AccountPage() {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 480 }}>
-      <p><a href="/">&larr; Home</a></p>
+      <p><Link href="/">&larr; Home</Link></p>
       <h1>My Account</h1>
       <p style={{ color: "#555" }}>
         Signed in as <strong>{session.user.name}</strong> ({session.user.username}) —{" "}
