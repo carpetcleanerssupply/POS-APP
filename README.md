@@ -87,13 +87,19 @@ secrets required.
 
 ## Environments
 
-The Neon integration on this Vercel project ties `POSTGRES_*` / `DATABASE_URL`
-together across Preview and Production by default — there's no per-environment
-branch mapping exposed in the dashboard for this integration. Local dev
-currently points `.env` at a separate Neon branch (`preview`) created and
-wired in manually; Production is untouched. Deployed Preview builds (from a
-PR/branch) still share Production's database — known, deferred, lower
-priority since most testing happens locally.
+Local dev points `.env` at a separate Neon branch (`preview`) created and
+wired in manually; Production is untouched.
+
+Deployed Preview builds (from a PR/branch) get their own isolated,
+automatically-created Neon branch too — configured via **Preview Branching**
+on the Neon integration (Vercel dashboard → Storage → neon-citrine-desert →
+Projects → pos-app → Update Project Connection → "Create Database Branch For
+Deployment" → Preview checked, Production unchecked). Each Preview deployment
+gets a fresh copy-on-write branch (`preview/<git-branch>`) with schema kept in
+sync by the existing `vercel-build` script; Production keeps its own
+connection and is never written to by a Preview build. This setting isn't
+exposed through the Vercel CLI or a plain `vercel env` call — it lives in the
+Neon integration's own connection panel, reachable from Vercel's Storage tab.
 
 ## Known gaps / deferred
 
