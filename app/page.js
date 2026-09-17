@@ -39,6 +39,8 @@ export default async function Home() {
         <a href="/items">Items</a>
         <a href="/customers">Customers</a>
         <a href="/invoices">Invoices</a>
+        <a href="/payments">Payments</a>
+        <a href="/returns">Returns</a>
       </nav>
 
       <div

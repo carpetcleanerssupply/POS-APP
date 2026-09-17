@@ -83,6 +83,11 @@ export default async function InvoiceDetailPage({ params }) {
           : `Paid via ${invoice.paymentMethod?.toLowerCase()}${invoice.checkNumber ? ` (check #${invoice.checkNumber})` : ""}.`}
       </p>
 
+      <p style={{ display: "flex", gap: "1rem" }}>
+        <a href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</a>
+        {isAccount && <a href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</a>}
+      </p>
+
       {invoice.notes && (
         <p style={{ marginTop: "1rem" }}>
           <strong>Notes:</strong> {invoice.notes}
