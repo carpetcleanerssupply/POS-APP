@@ -19,7 +19,7 @@ export default async function PurchaseOrdersPage() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Purchase Orders</h1>
-        <Link href="/purchase-orders/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+        <Link href="/purchase-orders/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
           + New PO
         </Link>
       </div>

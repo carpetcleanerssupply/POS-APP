@@ -1,6 +1,9 @@
 :root {
-  --background: #ffffff;
+  --background: #f7f2e8;
   --foreground: #171717;
+  --brand-navy: #1e3a5f;
+  --brand-navy-dark: #16304f;
+  --brand-beige: #f7f2e8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,5 +54,9 @@ a {
 @media print {
   .no-print {
     display: none !important;
+  }
+
+  body {
+    background: #fff;
   }
 }

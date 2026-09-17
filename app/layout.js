@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -41,7 +42,7 @@ export default async function RootLayout({ children }) {
                 padding: "0.6rem 1rem 0",
               }}
             >
-              <strong>Carpet Cleaners Supply — POS</strong>
+              <Image src="/logo.jpg" alt="Carpet Cleaners Supply" width={1200} height={308} style={{ width: "auto", height: 32 }} priority />
               <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", fontSize: "0.9rem" }}>
                 <span>
                   {session.user.name} ({isOwnerManager(session) ? "Owner/Manager" : "Staff"})

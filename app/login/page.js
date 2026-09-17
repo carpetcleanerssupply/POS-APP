@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const ERROR_MESSAGES = {
   missing: "Enter a username and password.",
   invalid: "Incorrect username or password.",
@@ -16,7 +18,7 @@ export default async function LoginPage({ searchParams }) {
         margin: "4rem auto 0",
       }}
     >
-      <h1 style={{ fontSize: "1.5rem" }}>Carpet Cleaners Supply</h1>
+      <Image src="/logo.jpg" alt="Carpet Cleaners Supply" width={1200} height={308} style={{ width: "100%", maxWidth: 260, height: "auto" }} priority />
       <p style={{ color: "#555", marginTop: "0.25rem" }}>Sign in to the POS</p>
 
       {error && (
