@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/auth";
 
 // Live database status on every request, not baked in at build time.
 export const dynamic = "force-dynamic";
@@ -13,11 +14,25 @@ async function checkDatabase() {
 }
 
 export default async function Home() {
+  const session = await requireSession();
   const db = await checkDatabase();
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 640 }}>
-      <h1>Carpet Cleaners Supply — POS</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <h1>Carpet Cleaners Supply — POS</h1>
+          <p>
+            Signed in as <strong>{session.user.name}</strong>{" "}
+            ({session.user.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"})
+          </p>
+        </div>
+        <form action="/api/auth/logout" method="POST">
+          <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>
+            Sign out
+          </button>
+        </form>
+      </div>
       <p>Pipeline check: code → Vercel → live database.</p>
 
       <div
