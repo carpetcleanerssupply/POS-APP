@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && prisma migrate deploy && (node scripts/seed-user.js bdesemple \"Brian DeSemple\" OWNER_MANAGER; node scripts/seed-user.js amercer \"Annie Mercer\" OWNER_MANAGER; node scripts/seed-user.js sdoss \"Steve Doss\" STAFF) && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs"
