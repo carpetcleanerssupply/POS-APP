@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireSessionJson } from "@/lib/auth";
 import { TAX_RATE, lineExt } from "@/lib/invoices";
-import { displayName } from "@/lib/customers";
+import { displayName, addressSnapshots } from "@/lib/customers";
 
 export async function POST(request) {
   const { session, unauthorized } = await requireSessionJson();
@@ -56,20 +56,7 @@ export async function POST(request) {
       customerName: displayName(customer),
       customerEmail: customer.email,
       customerEmail2: customer.email2,
-      customerBillingSnapshot: {
-        street: customer.billingStreet,
-        street2: customer.billingStreet2,
-        city: customer.billingCity,
-        state: customer.billingState,
-        zip: customer.billingZip,
-      },
-      customerShippingSnapshot: {
-        street: customer.shippingStreet,
-        street2: customer.shippingStreet2,
-        city: customer.shippingCity,
-        state: customer.shippingState,
-        zip: customer.shippingZip,
-      },
+      ...addressSnapshots(customer),
       subtotal,
       shippingCharge,
       tax,

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireSessionJson } from "@/lib/auth";
 import { TAX_RATE, buildInvoiceLines, InvoiceValidationError } from "@/lib/invoices";
-import { displayName } from "@/lib/customers";
+import { displayName, addressSnapshots } from "@/lib/customers";
 
 // Updates a DRAFT in place (customer, lines, shipping/notes). Never touches
 // stock or money — that only happens when the draft is actually closed.
@@ -62,6 +62,7 @@ export async function POST(request, { params }) {
           customerName: displayName(customer),
           customerEmail: customer.email,
           customerEmail2: customer.email2,
+          ...addressSnapshots(customer),
           subtotal,
           shippingCharge,
           tax,

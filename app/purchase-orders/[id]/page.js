@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
 import { poTotal } from "@/lib/purchaseOrders";
+import { buildMailtoUrl } from "@/lib/mailto";
+import { COMPANY } from "@/lib/company";
 import PODetailActions from "../PODetailActions";
+import PrintButton from "../../PrintButton";
+import EmailButton from "../../EmailButton";
 
 const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
 const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
@@ -16,14 +20,32 @@ export default async function PurchaseOrderDetailPage({ params }) {
   const session = await requireSession();
   const { id } = await params;
 
-  const po = await prisma.purchaseOrder.findUnique({ where: { id }, include: { lines: true } });
+  const po = await prisma.purchaseOrder.findUnique({ where: { id }, include: { lines: true, vendor: true } });
   if (!po) notFound();
 
   const total = poTotal(po.lines);
 
+  const emailBodyLines = [
+    `Purchase Order #${po.number} from ${COMPANY.name}`,
+    `Date: ${new Date(po.date).toLocaleDateString()}`,
+    `Vendor: ${po.vendorName || "—"}`,
+    "",
+    ...po.lines.map((l) => `${l.sku} — ${l.name} — Qty ${l.qtyOrdered} @ $${Number(l.cost).toFixed(2)} = $${(l.qtyOrdered * Number(l.cost)).toFixed(2)}`),
+    "",
+    `PO Total: $${total.toFixed(2)}`,
+    ...(po.notes ? ["", `Notes: ${po.notes}`] : []),
+    "",
+    `Please confirm receipt of this order.`,
+  ];
+  const emailMailto = buildMailtoUrl({
+    to: [po.vendor?.email, po.vendor?.email2].filter(Boolean).join(","),
+    subject: `Purchase Order #${po.number} from ${COMPANY.name}`,
+    body: emailBodyLines.join("\n"),
+  });
+
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p><a href="/purchase-orders">&larr; Back to Purchase Orders</a></p>
+      <p className="no-print"><a href="/purchase-orders">&larr; Back to Purchase Orders</a></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>PO #{po.number}</h1>
@@ -69,7 +91,14 @@ export default async function PurchaseOrderDetailPage({ params }) {
         </p>
       )}
 
-      <PODetailActions po={po} lines={po.lines} canUnmarkPaid={isOwnerManager(session)} />
+      <p className="no-print" style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+        <PrintButton />
+        <EmailButton mailtoUrl={emailMailto} />
+      </p>
+
+      <div className="no-print">
+        <PODetailActions po={po} lines={po.lines} canUnmarkPaid={isOwnerManager(session)} />
+      </div>
     </main>
   );
 }

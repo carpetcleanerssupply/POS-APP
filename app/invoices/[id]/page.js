@@ -1,7 +1,13 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { formatAddress } from "@/lib/customers";
+import { paymentMethodLabel } from "@/lib/payments";
+import { buildMailtoUrl } from "@/lib/mailto";
+import { COMPANY } from "@/lib/company";
 import DeleteDraftButton from "../DeleteDraftButton";
+import PrintButton from "../../PrintButton";
+import EmailButton from "../../EmailButton";
 
 const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
 const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
@@ -19,9 +25,41 @@ export default async function InvoiceDetailPage({ params }) {
   const isDraft = invoice.status === "DRAFT";
   const isAccount = invoice.settledTo === "ACCOUNT";
 
+  const emailBodyLines = [
+    `Invoice #${invoice.number} from ${COMPANY.name}`,
+    ...(isDraft ? ["*** DRAFT — NOT YET FINAL ***"] : []),
+    `Invoice Date: ${new Date(invoice.date).toLocaleDateString()}`,
+    ...(invoice.dueDate ? [`Due Date: ${new Date(invoice.dueDate).toLocaleDateString()}`] : []),
+    ...(invoice.customerPO ? [`P.O. #: ${invoice.customerPO}`] : []),
+    `Customer: ${invoice.customerName}`,
+    `Billing: ${formatAddress(invoice.customerBillingSnapshot) || "—"}`,
+    `Shipping: ${formatAddress(invoice.customerShippingSnapshot) || "—"}`,
+    "",
+    ...invoice.lines.map(
+      (l) =>
+        `${l.qty} x ${l.name} (${l.sku}) @ $${Number(l.price).toFixed(2)}${Number(l.discountPct) > 0 ? ` (-${l.discountPct}%)` : ""} = $${Number(l.ext).toFixed(2)}`
+    ),
+    "",
+    `Subtotal: $${Number(invoice.subtotal).toFixed(2)}`,
+    ...(Number(invoice.shippingCharge) > 0 ? [`Shipping: $${Number(invoice.shippingCharge).toFixed(2)}`] : []),
+    ...(Number(invoice.tax) > 0 ? [`Tax: $${Number(invoice.tax).toFixed(2)}`] : []),
+    `Total: $${Number(invoice.total).toFixed(2)}`,
+    ...(isDraft
+      ? []
+      : [`Payment: ${isAccount ? "Charged to account" : paymentMethodLabel(invoice.paymentMethod, invoice.checkNumber)}`]),
+    ...(invoice.notes ? ["", `Notes: ${invoice.notes}`] : []),
+    "",
+    `Thank you for your business — ${COMPANY.name}`,
+  ];
+  const emailMailto = buildMailtoUrl({
+    to: [invoice.customerEmail, invoice.customerEmail2].filter(Boolean).join(","),
+    subject: `Invoice #${invoice.number} from ${COMPANY.name}`,
+    body: emailBodyLines.join("\n"),
+  });
+
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p><a href="/invoices">&larr; Back to Invoices</a></p>
+      <p className="no-print"><a href="/invoices">&larr; Back to Invoices</a></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Invoice #{invoice.number}</h1>
@@ -51,7 +89,7 @@ export default async function InvoiceDetailPage({ params }) {
       </p>
 
       <h3>{invoice.customerName}</h3>
-      {invoice.customer && <p style={{ color: "#555" }}><a href={`/customers/${invoice.customer.id}/edit`}>View customer</a></p>}
+      {invoice.customer && <p className="no-print" style={{ color: "#555" }}><a href={`/customers/${invoice.customer.id}/edit`}>View customer</a></p>}
 
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
         <thead>
@@ -93,7 +131,9 @@ export default async function InvoiceDetailPage({ params }) {
         </p>
       )}
 
-      <p style={{ display: "flex", gap: "1rem" }}>
+      <p className="no-print" style={{ display: "flex", gap: "1rem" }}>
+        <PrintButton />
+        <EmailButton mailtoUrl={emailMailto} />
         {isDraft ? (
           <>
             <a href={`/invoices/${invoice.id}/edit`}>Edit / Close Draft</a>

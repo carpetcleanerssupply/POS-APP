@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { buildMailtoUrl } from "@/lib/mailto";
+import { COMPANY } from "@/lib/company";
+import PrintButton from "../../PrintButton";
+import EmailButton from "../../EmailButton";
 
 const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
 const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
@@ -16,10 +20,37 @@ export default async function EstimateDetailPage({ params }) {
   if (!estimate) notFound();
 
   const isConverted = estimate.status === "CONVERTED";
+  const totalDiscount = estimate.lines.reduce((sum, l) => sum + (Number(l.price) * l.qty - Number(l.ext)), 0);
+
+  const emailBodyLines = [
+    `Estimate #${estimate.number} from ${COMPANY.name}`,
+    `Date: ${new Date(estimate.date).toLocaleDateString()}`,
+    ...(estimate.expirationDate ? [`Valid Until: ${new Date(estimate.expirationDate).toLocaleDateString()}`] : []),
+    `Customer: ${estimate.customerName}`,
+    "",
+    ...estimate.lines.map(
+      (l) =>
+        `${l.qty} x ${l.name} (${l.sku}) @ $${Number(l.price).toFixed(2)}${Number(l.discountPct) > 0 ? ` (-${l.discountPct}%)` : ""} = $${Number(l.ext).toFixed(2)}`
+    ),
+    "",
+    `Subtotal: $${Number(estimate.subtotal).toFixed(2)}`,
+    ...(Number(estimate.shippingCharge) > 0 ? [`Shipping: $${Number(estimate.shippingCharge).toFixed(2)}`] : []),
+    `Total: $${Number(estimate.total).toFixed(2)}`,
+    ...(totalDiscount > 0.005 ? [`(Includes $${totalDiscount.toFixed(2)} in item discounts.)`] : []),
+    ...(estimate.notes ? ["", `Notes: ${estimate.notes}`] : []),
+    ...(estimate.expirationDate
+      ? ["", `This estimate is valid until ${new Date(estimate.expirationDate).toLocaleDateString()}.`]
+      : []),
+  ];
+  const emailMailto = buildMailtoUrl({
+    to: [estimate.customerEmail, estimate.customerEmail2].filter(Boolean).join(","),
+    subject: `Estimate from ${COMPANY.name}`,
+    body: emailBodyLines.join("\n"),
+  });
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p><a href="/estimates">&larr; Back to Estimates</a></p>
+      <p className="no-print"><a href="/estimates">&larr; Back to Estimates</a></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Estimate #{estimate.number}</h1>
@@ -82,7 +113,9 @@ export default async function EstimateDetailPage({ params }) {
         </p>
       )}
 
-      <p style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+      <p className="no-print" style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+        <PrintButton />
+        <EmailButton mailtoUrl={emailMailto} />
         {isConverted ? (
           estimate.convertedInvoice && (
             <a href={`/invoices/${estimate.convertedInvoice.id}`}>View Invoice #{estimate.convertedInvoice.number}</a>
