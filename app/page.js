@@ -35,6 +35,10 @@ export default async function Home() {
       </div>
       <p>Pipeline check: code → Vercel → live database.</p>
 
+      <nav style={{ margin: "1rem 0" }}>
+        <a href="/items">Items</a>
+      </nav>
+
       <div
         style={{
           marginTop: "1.5rem",
