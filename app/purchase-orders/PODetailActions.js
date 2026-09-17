@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function PODetailActions({ po, lines, canUnmarkPaid }) {
@@ -48,7 +49,7 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
         {po.status === "DRAFT" && (
           <>
-            <a href={`/purchase-orders/${po.id}/edit`}>Edit</a>
+            <Link href={`/purchase-orders/${po.id}/edit`}>Edit</Link>
             <button type="button" disabled={busy} onClick={() => call(`/api/purchase-orders/${po.id}/mark-ordered`)} style={{ cursor: "pointer" }}>
               Mark Ordered
             </button>
@@ -64,7 +65,7 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
             </button>
           </>
         )}
-        {po.status === "ORDERED" && <a href={`/purchase-orders/${po.id}/edit`}>Edit</a>}
+        {po.status === "ORDERED" && <Link href={`/purchase-orders/${po.id}/edit`}>Edit</Link>}
 
         {!po.paid && (
           <>

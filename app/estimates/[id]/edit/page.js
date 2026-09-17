@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import EstimateForm from "../../EstimateForm";
@@ -15,7 +16,7 @@ export default async function EditEstimatePage({ params }) {
   if (estimate.status !== "OPEN") {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>This estimate has been converted and can no longer be edited. <a href={`/estimates/${id}`}>View it</a>.</p>
+        <p>This estimate has been converted and can no longer be edited. <Link href={`/estimates/${id}`}>View it</Link>.</p>
       </main>
     );
   }
@@ -27,7 +28,7 @@ export default async function EditEstimatePage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href={`/estimates/${id}`}>&larr; Back to Estimate #{estimate.number}</a></p>
+      <p><Link href={`/estimates/${id}`}>&larr; Back to Estimate #{estimate.number}</Link></p>
       <h1>Edit Estimate #{estimate.number}</h1>
       <EstimateForm
         items={plainItems}

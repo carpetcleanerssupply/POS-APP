@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
-import { isLowStock, lowStockThreshold } from "@/lib/items";
+import { isLowStock, lowStockThreshold, casesPlusEach } from "@/lib/items";
 import DeleteItemButton from "./DeleteItemButton";
 
 const DELETE_ERROR_MESSAGES = {
@@ -91,7 +91,10 @@ export default async function ItemsPage({ searchParams }) {
             <th style={th}>Vendor</th>
             <th style={th}>Cost</th>
             <th style={th}>Price</th>
+            <th style={th}>Unit</th>
+            <th style={th}>Units/Case</th>
             <th style={th}>Stock</th>
+            <th style={th} title="Cases + individual units — a case-friendly read on Stock, for whoever's counting shelves">CS+EA</th>
             <th style={th}></th>
           </tr>
         </thead>
@@ -104,12 +107,15 @@ export default async function ItemsPage({ searchParams }) {
               <td style={td}>{item.vendorName || "—"}</td>
               <td style={td}>${Number(item.cost).toFixed(2)}</td>
               <td style={td}>${Number(item.price).toFixed(2)}</td>
+              <td style={td}>{item.unit || "—"}</td>
+              <td style={td}>{(item.caseQty || 1) > 1 ? item.caseQty : "—"}</td>
               <td style={td}>
                 {item.stock}
                 {isLowStock(item) && (
                   <span title={`At or below ${lowStockThreshold(item)}`}> ⚠</span>
                 )}
               </td>
+              <td style={td}>{casesPlusEach(item) || "—"}</td>
               <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
                 <Link href={`/items/${item.id}/edit`}>Edit</Link>
                 <DeleteItemButton itemId={item.id} itemName={item.name} />
@@ -118,7 +124,7 @@ export default async function ItemsPage({ searchParams }) {
           ))}
           {items.length === 0 && (
             <tr>
-              <td style={td} colSpan={8}>
+              <td style={td} colSpan={11}>
                 {allItems.length === 0 ? "No items yet." : "No items match your filters."}
               </td>
             </tr>

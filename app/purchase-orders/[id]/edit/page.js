@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isPoEditable } from "@/lib/purchaseOrders";
@@ -16,7 +17,7 @@ export default async function EditPurchaseOrderPage({ params }) {
   if (!isPoEditable(po)) {
     return (
       <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>This PO can no longer be edited — receiving has already started. <a href={`/purchase-orders/${id}`}>View it</a>.</p>
+        <p>This PO can no longer be edited — receiving has already started. <Link href={`/purchase-orders/${id}`}>View it</Link>.</p>
       </main>
     );
   }
@@ -37,7 +38,7 @@ export default async function EditPurchaseOrderPage({ params }) {
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><a href={`/purchase-orders/${id}`}>&larr; Back to PO #{po.number}</a></p>
+      <p><Link href={`/purchase-orders/${id}`}>&larr; Back to PO #{po.number}</Link></p>
       <h1>Edit PO #{po.number}</h1>
       <POForm
         items={plainItems}
