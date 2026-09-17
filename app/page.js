@@ -61,6 +61,7 @@ export default async function Home() {
         <a href="/returns">Returns</a>
         <a href="/vendors">Vendors</a>
         <a href="/purchase-orders">Purchase Orders</a>
+        {owner && <a href="/admin">Admin</a>}
       </nav>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", margin: "1.5rem 0" }}>
