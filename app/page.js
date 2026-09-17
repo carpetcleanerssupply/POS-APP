@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
@@ -41,33 +40,8 @@ export default async function Home() {
   }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <h1>Carpet Cleaners Supply — POS</h1>
-          <p>
-            Signed in as <strong>{session.user.name}</strong> ({owner ? "Owner/Manager" : "Staff"})
-          </p>
-        </div>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/account">My Account</Link>
-          <form action="/api/auth/logout" method="POST">
-            <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Sign out</button>
-          </form>
-        </div>
-      </div>
-
-      <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-        <Link href="/items">Items</Link>
-        <Link href="/customers">Customers</Link>
-        <Link href="/invoices">Invoices</Link>
-        <Link href="/estimates">Estimates</Link>
-        <Link href="/payments">Payments</Link>
-        <Link href="/returns">Returns</Link>
-        <Link href="/vendors">Vendors</Link>
-        <Link href="/purchase-orders">Purchase Orders</Link>
-        {owner && <Link href="/admin">Admin</Link>}
-      </nav>
+    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem 3rem 3rem", maxWidth: 960 }}>
+      <h1>Dashboard</h1>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", margin: "1.5rem 0" }}>
         <div style={tile}>
