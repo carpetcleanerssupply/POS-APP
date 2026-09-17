@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Papa from "papaparse";
 
 export default function DashboardActivityLog({ entries }) {
   const [show, setShow] = useState(false);
@@ -15,6 +16,23 @@ export default function DashboardActivityLog({ entries }) {
       return true;
     });
   }, [entries, from, to]);
+
+  function exportCsv() {
+    if (filtered.length === 0) return;
+    const csv = Papa.unparse({
+      fields: ["Date/Time", "Action", "User", "Details"],
+      data: filtered.map((a) => [new Date(a.timestamp).toLocaleString(), a.action, a.userName || "", a.detailsText || ""]),
+    });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `activity-log-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
@@ -37,6 +55,11 @@ export default function DashboardActivityLog({ entries }) {
             {(from || to) && (
               <button type="button" onClick={() => { setFrom(""); setTo(""); }} style={{ cursor: "pointer", fontSize: "0.85rem" }}>
                 Clear
+              </button>
+            )}
+            {filtered.length > 0 && (
+              <button type="button" onClick={exportCsv} style={{ cursor: "pointer", fontSize: "0.85rem", marginLeft: "auto" }}>
+                Export CSV
               </button>
             )}
           </div>
