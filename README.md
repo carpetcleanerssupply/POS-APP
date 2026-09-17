@@ -80,6 +80,11 @@ Real integration tests against a running dev server and a real database —
 see `tests/README.md`. **Never point `TEST_BASE_URL` / `.env` at production**
 — every test creates and cleans up its own data, but it's still live writes.
 
+CI (`.github/workflows/test.yml`) runs lint, build, and the full test suite
+on every push/PR to `main`, against a throwaway Postgres container it
+provisions itself — entirely separate from the real Neon database, no
+secrets required.
+
 ## Environments
 
 The Neon integration on this Vercel project ties `POSTGRES_*` / `DATABASE_URL`
