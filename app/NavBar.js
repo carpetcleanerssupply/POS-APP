@@ -24,12 +24,14 @@ const tabStyle = {
   borderRadius: 6,
   fontSize: "0.9rem",
   whiteSpace: "nowrap",
+  color: "#dce6f0",
 };
 
 const activeTabStyle = {
   ...tabStyle,
-  background: "#1a1a1a",
-  color: "#fff",
+  background: "#f7f2e8",
+  color: "#1e3a5f",
+  fontWeight: 600,
 };
 
 export default function NavBar({ tierOwner }) {
@@ -52,6 +54,8 @@ export default function NavBar({ tierOwner }) {
         flexWrap: "nowrap",
         overflowX: "auto",
         padding: "0.5rem 1rem",
+        marginTop: "0.6rem",
+        background: "#1e3a5f",
       }}
     >
       {items.map((item) => (

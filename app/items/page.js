@@ -44,7 +44,7 @@ export default async function ItemsPage({ searchParams }) {
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
           <Link href="/api/items/export">Export CSV</Link>
           <Link href="/items/import">Import CSV</Link>
-          <Link href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+          <Link href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Item
           </Link>
         </div>
