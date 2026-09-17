@@ -107,7 +107,6 @@ Neon integration's own connection panel, reachable from Vercel's Storage tab.
   the original prototype's design — nothing is sent server-side).
 - No per-vendor pricing for the same item — confirmed not needed; each item
   has exactly one vendor and one cost.
-- Deployed Preview deployments share Production's database (see above).
 
 ## Project history
 
