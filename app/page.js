@@ -42,6 +42,8 @@ export default async function Home() {
         <a href="/estimates">Estimates</a>
         <a href="/payments">Payments</a>
         <a href="/returns">Returns</a>
+        <a href="/vendors">Vendors</a>
+        <a href="/purchase-orders">Purchase Orders</a>
       </nav>
 
       <div
