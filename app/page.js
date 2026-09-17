@@ -48,9 +48,12 @@ export default async function Home() {
             Signed in as <strong>{session.user.name}</strong> ({owner ? "Owner/Manager" : "Staff"})
           </p>
         </div>
-        <form action="/api/auth/logout" method="POST">
-          <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Sign out</button>
-        </form>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <a href="/account">My Account</a>
+          <form action="/api/auth/logout" method="POST">
+            <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Sign out</button>
+          </form>
+        </div>
       </div>
 
       <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
