@@ -12,24 +12,16 @@ function currency(n) {
   return `$${Number(n).toFixed(2)}`;
 }
 
-export default function NewInvoiceForm({ items, customers, estimateId = null, initialCustomerId = null, initialLines = [] }) {
+export default function EstimateForm({ items, customer, estimateId, initialLines = [], initialExpiration = "", initialNotes = "", initialShippingCharge = "0" }) {
   const router = useRouter();
-  const [customerId, setCustomerId] = useState(initialCustomerId || "");
-  const [saleType, setSaleType] = useState("WALKIN");
-  const [customerPO, setCustomerPO] = useState("");
-  const [shipVia, setShipVia] = useState("");
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [notes, setNotes] = useState("");
-  const [shippingCharge, setShippingCharge] = useState("0");
+  const [expirationDate, setExpirationDate] = useState(initialExpiration);
+  const [notes, setNotes] = useState(initialNotes);
+  const [shippingCharge, setShippingCharge] = useState(initialShippingCharge);
   const [lines, setLines] = useState(initialLines);
   const [pickerSku, setPickerSku] = useState("");
-  const [settledTo, setSettledTo] = useState("PAID_NOW");
-  const [paymentMethod, setPaymentMethod] = useState("CARD");
-  const [checkNumber, setCheckNumber] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const customer = customers.find((c) => c.id === customerId) || null;
   const itemsById = useMemo(() => Object.fromEntries(items.map((i) => [i.id, i])), [items]);
 
   const lineRows = lines.map((l) => {
@@ -38,7 +30,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
   });
 
   const subtotal = lineRows.reduce((sum, r) => sum + r.ext, 0);
-  const tax = customer?.taxExempt ? 0 : subtotal * TAX_RATE;
+  const tax = customer.taxExempt ? 0 : subtotal * TAX_RATE;
   const shipCharge = Math.max(0, Number(shippingCharge) || 0);
   const total = subtotal + shipCharge + tax;
 
@@ -53,9 +45,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
     setError(null);
     setLines((prev) => {
       const existing = prev.find((l) => l.itemId === item.id);
-      if (existing) {
-        return prev.map((l) => (l.itemId === item.id ? { ...l, qty: (Number(l.qty) || 0) + 1 } : l));
-      }
+      if (existing) return prev.map((l) => (l.itemId === item.id ? { ...l, qty: (Number(l.qty) || 0) + 1 } : l));
       return [...prev, { itemId: item.id, qty: 1, discountPct: 0, note: "" }];
     });
     setPickerSku("");
@@ -72,44 +62,33 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
-
-    if (!customerId) return setError("Select a customer.");
     if (lines.length === 0) return setError("Add at least one line item.");
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/invoices", {
+      const res = await fetch(estimateId ? `/api/estimates/${estimateId}` : "/api/estimates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId,
-          saleType,
-          customerPO,
-          shipVia,
-          trackingNumber,
+          customerId: customer.id,
+          expirationDate: expirationDate || null,
           notes,
           shippingCharge: shipCharge,
           lines: lines.map((l) => ({ itemId: l.itemId, qty: Number(l.qty) || 0, discountPct: l.discountPct, note: l.note })),
-          settledTo,
-          paymentMethod,
-          checkNumber,
-          estimateId,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Something went wrong saving this invoice.");
+        setError(data.error || "Something went wrong saving this estimate.");
         setSubmitting(false);
         return;
       }
-      router.push(`/invoices/${data.id}`);
-    } catch (err) {
-      setError("Network error — the invoice was not saved.");
+      router.push(`/estimates/${data.id}`);
+    } catch {
+      setError("Network error — the estimate was not saved.");
       setSubmitting(false);
     }
   }
-
-  const isWalkInCustomer = Boolean(customer?.isWalkIn);
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -117,41 +96,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
         <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
       )}
 
-      {estimateId && (
-        <p style={{ background: "#fff3e0", color: "#e65100", padding: "0.75rem 1rem", borderRadius: 8 }}>
-          Converting from estimate — line items were prefilled below. Choose payment to close this invoice.
-        </p>
-      )}
-
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Customer *
-          <select
-            value={customerId}
-            onChange={(e) => {
-              setCustomerId(e.target.value);
-              const c = customers.find((cust) => cust.id === e.target.value);
-              if (c?.isWalkIn) setSettledTo("PAID_NOW");
-            }}
-            style={fieldStyle}
-          >
-            <option value="">Select a customer...</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-                {c.isWalkIn ? " (walk-in)" : ""}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label style={labelStyle}>
-          Sale Type
-          <select value={saleType} onChange={(e) => setSaleType(e.target.value)} style={fieldStyle}>
-            <option value="WALKIN">Walk-in</option>
-            <option value="PHONE">Phone</option>
-          </select>
-        </label>
-      </div>
+      <p>Customer: <strong>{customer.name}</strong></p>
 
       <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
@@ -194,14 +139,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
             <tbody>
               {lineRows.map((r) => (
                 <tr key={r.itemId}>
-                  <td>
-                    {r.item ? `${r.item.name} (${r.item.sku})` : "Unknown item"}
-                    {r.item && Number(r.qty) > r.item.stock && (
-                      <div style={{ color: "#c62828", fontSize: "0.8rem" }}>
-                        Only {r.item.stock} in stock
-                      </div>
-                    )}
-                  </td>
+                  <td>{r.item ? `${r.item.name} (${r.item.sku})` : "Unknown item"}</td>
                   <td>
                     <input
                       type="number"
@@ -236,16 +174,12 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
 
       <div style={rowStyle}>
         <label style={labelStyle}>
-          Customer PO
-          <input value={customerPO} onChange={(e) => setCustomerPO(e.target.value)} style={fieldStyle} />
+          Expiration Date
+          <input type="date" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} style={fieldStyle} />
         </label>
         <label style={labelStyle}>
-          Ship Via
-          <input value={shipVia} onChange={(e) => setShipVia(e.target.value)} style={fieldStyle} />
-        </label>
-        <label style={labelStyle}>
-          Tracking #
-          <input value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} style={fieldStyle} />
+          Shipping Charge
+          <input type="number" min="0" step="0.01" value={shippingCharge} onChange={(e) => setShippingCharge(e.target.value)} style={fieldStyle} />
         </label>
       </div>
 
@@ -254,69 +188,17 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
         <textarea value={notes} onChange={(e) => setNotes(e.target.value)} style={{ ...fieldStyle, minHeight: 60 }} />
       </label>
 
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Shipping Charge
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={shippingCharge}
-            onChange={(e) => setShippingCharge(e.target.value)}
-            style={fieldStyle}
-          />
-        </label>
-      </div>
-
       <div style={{ textAlign: "right", fontSize: "0.95rem" }}>
         <div>Subtotal: {currency(subtotal)}</div>
         {TAX_RATE > 0 && <div>Tax: {currency(tax)}</div>}
         <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: {currency(total)}</div>
       </div>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Settle As
-            <select
-              value={settledTo}
-              onChange={(e) => setSettledTo(e.target.value)}
-              disabled={isWalkInCustomer}
-              style={fieldStyle}
-            >
-              <option value="PAID_NOW">Paid Now</option>
-              <option value="ACCOUNT">Charge to Account</option>
-            </select>
-            {isWalkInCustomer && (
-              <span style={{ fontSize: "0.8rem", color: "#777" }}>Walk-in customers must be paid now.</span>
-            )}
-          </label>
-
-          {settledTo === "PAID_NOW" && (
-            <label style={labelStyle}>
-              Payment Method
-              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={fieldStyle}>
-                <option value="CARD">Card</option>
-                <option value="CHECK">Check</option>
-                <option value="CASH">Cash</option>
-              </select>
-            </label>
-          )}
-
-          {settledTo === "PAID_NOW" && paymentMethod === "CHECK" && (
-            <label style={labelStyle}>
-              Check Number
-              <input value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} style={fieldStyle} />
-            </label>
-          )}
-        </div>
-      </div>
-
       <div style={{ display: "flex", gap: "0.75rem" }}>
         <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
-          {submitting ? "Saving..." : "Close Invoice"}
+          {submitting ? "Saving..." : "Save Estimate"}
         </button>
-        <a href="/invoices" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
+        <a href="/estimates" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
           Cancel
         </a>
       </div>

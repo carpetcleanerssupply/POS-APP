@@ -24,6 +24,7 @@ export async function POST(request) {
     settledTo,
     paymentMethod,
     checkNumber = "",
+    estimateId = null,
   } = body;
 
   if (!customerId) return Response.json({ error: "Select a customer." }, { status: 400 });
@@ -59,6 +60,14 @@ export async function POST(request) {
   const dedupedLines = rawLines.filter((l) => l && l.itemId && Number(l.qty) > 0);
   if (dedupedLines.length === 0) {
     return Response.json({ error: "Add at least one line item with a quantity greater than 0." }, { status: 400 });
+  }
+
+  if (estimateId) {
+    const estimate = await prisma.estimate.findUnique({ where: { id: estimateId } });
+    if (!estimate) return Response.json({ error: "That estimate no longer exists." }, { status: 404 });
+    if (estimate.status !== "OPEN") {
+      return Response.json({ error: "That estimate has already been converted." }, { status: 400 });
+    }
   }
 
   try {
@@ -138,10 +147,23 @@ export async function POST(request) {
           checkNumber: !chargingAccount && paymentMethod === "CHECK" ? checkNumber.trim() : null,
           settledTo,
           paidAmount,
+          convertedFromEstimateId: estimateId || null,
           lines: { create: lineData },
         },
         include: { lines: true },
       });
+
+      if (estimateId) {
+        // Guarded: only succeeds if the estimate is still OPEN, so two people
+        // converting the same estimate at once can't both succeed.
+        const converted = await tx.estimate.updateMany({
+          where: { id: estimateId, status: "OPEN" },
+          data: { status: "CONVERTED" },
+        });
+        if (converted.count === 0) {
+          throw new InvoiceValidationError("That estimate has already been converted.");
+        }
+      }
 
       if (chargingAccount) {
         await tx.customer.update({ where: { id: customer.id }, data: { balance: { increment: total } } });

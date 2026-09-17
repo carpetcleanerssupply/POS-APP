@@ -5,13 +5,24 @@ import NewInvoiceForm from "../NewInvoiceForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewInvoicePage() {
+export default async function NewInvoicePage({ searchParams }) {
   await requireSession();
+  const params = await searchParams;
+  const estimateId = params?.estimateId || null;
 
-  const [items, customers] = await Promise.all([
+  const [items, customers, estimate] = await Promise.all([
     prisma.item.findMany({ orderBy: { name: "asc" } }),
     prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] }),
+    estimateId ? prisma.estimate.findUnique({ where: { id: estimateId }, include: { lines: true } }) : null,
   ]);
+
+  if (estimateId && (!estimate || estimate.status !== "OPEN")) {
+    return (
+      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
+        <p>That estimate isn&apos;t available to convert. <a href="/invoices/new">Start a blank invoice</a>.</p>
+      </main>
+    );
+  }
 
   const plainItems = items.map((i) => ({
     id: i.id,
@@ -43,7 +54,17 @@ export default async function NewInvoicePage() {
           <a href="/items/new">Add an item</a> first.
         </p>
       ) : (
-        <NewInvoiceForm items={plainItems} customers={plainCustomers} />
+        <NewInvoiceForm
+          items={plainItems}
+          customers={plainCustomers}
+          estimateId={estimate?.id || null}
+          initialCustomerId={estimate?.customerId || null}
+          initialLines={
+            estimate
+              ? estimate.lines.map((l) => ({ itemId: l.itemId, qty: l.qty, discountPct: Number(l.discountPct), note: l.note || "" }))
+              : []
+          }
+        />
       )}
     </main>
   );
