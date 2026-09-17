@@ -17,9 +17,15 @@ export async function POST(request, { params }) {
   }
 
   const body = await request.json().catch(() => ({}));
+  const marking = !po.paid;
+
+  if (marking && body.method === "CHECK" && !body.checkNumber?.trim()) {
+    return Response.json({ error: "Enter a check number." }, { status: 400 });
+  }
+
   await prisma.purchaseOrder.update({
     where: { id },
-    data: { paid: !po.paid, checkNumber: !po.paid ? body.checkNumber || null : po.checkNumber },
+    data: { paid: marking, checkNumber: marking ? (body.method === "CHECK" ? body.checkNumber.trim() : null) : po.checkNumber },
   });
 
   return Response.json({ ok: true, paid: !po.paid });

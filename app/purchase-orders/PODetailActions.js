@@ -8,6 +8,8 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [receiveQtys, setReceiveQtys] = useState({});
+  const [payMethod, setPayMethod] = useState("CARD");
+  const [payCheckNumber, setPayCheckNumber] = useState("");
 
   async function call(url, body) {
     setBusy(true);
@@ -63,11 +65,29 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
           </>
         )}
         {po.status === "ORDERED" && <a href={`/purchase-orders/${po.id}/edit`}>Edit</a>}
+
+        {!po.paid && (
+          <>
+            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)} style={{ padding: "0.3rem" }}>
+              <option value="CARD">Card</option>
+              <option value="CHECK">Check</option>
+              <option value="CASH">Cash</option>
+            </select>
+            {payMethod === "CHECK" && (
+              <input
+                placeholder="Check #"
+                value={payCheckNumber}
+                onChange={(e) => setPayCheckNumber(e.target.value)}
+                style={{ padding: "0.3rem", width: 100 }}
+              />
+            )}
+          </>
+        )}
         <button
           type="button"
           disabled={busy || (po.paid && !canUnmarkPaid)}
           title={po.paid && !canUnmarkPaid ? "Unmarking as paid requires an Owner/Manager login" : undefined}
-          onClick={() => call(`/api/purchase-orders/${po.id}/toggle-paid`, {})}
+          onClick={() => call(`/api/purchase-orders/${po.id}/toggle-paid`, { method: payMethod, checkNumber: payCheckNumber })}
           style={{ cursor: po.paid && !canUnmarkPaid ? "not-allowed" : "pointer" }}
         >
           {po.paid ? "Unmark as Paid" : "Mark as Paid"}

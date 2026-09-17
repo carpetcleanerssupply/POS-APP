@@ -50,7 +50,7 @@ export default async function PurchaseOrderDetailPage({ params }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>PO #{po.number}</h1>
         <span style={{ padding: "0.3rem 0.7rem", borderRadius: 6, background: "#eee", fontWeight: 600, fontSize: "0.85rem" }}>
-          {STATUS_LABEL[po.status]}{po.paid ? " · Paid" : ""}
+          {STATUS_LABEL[po.status]}{po.paid ? ` · Paid${po.checkNumber ? ` (check #${po.checkNumber})` : ""}` : ""}
         </span>
       </div>
 
