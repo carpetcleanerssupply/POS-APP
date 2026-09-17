@@ -24,6 +24,7 @@ export async function POST(request) {
     settledTo,
     paymentMethod,
     checkNumber = "",
+    dueDate = null,
     estimateId = null,
   } = body;
 
@@ -115,6 +116,7 @@ export async function POST(request) {
         data: {
           status: "CLOSED",
           saleType,
+          dueDate: dueDate ? new Date(dueDate) : null,
           customerPO: customerPO || null,
           shipVia: shipVia || null,
           trackingNumber: trackingNumber || null,

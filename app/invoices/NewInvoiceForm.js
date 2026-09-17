@@ -26,6 +26,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
   const [settledTo, setSettledTo] = useState("PAID_NOW");
   const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [checkNumber, setCheckNumber] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -93,6 +94,7 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
           settledTo,
           paymentMethod,
           checkNumber,
+          dueDate: settledTo === "ACCOUNT" ? dueDate || null : null,
           estimateId,
         }),
       });
@@ -291,6 +293,13 @@ export default function NewInvoiceForm({ items, customers, estimateId = null, in
               <span style={{ fontSize: "0.8rem", color: "#777" }}>Walk-in customers must be paid now.</span>
             )}
           </label>
+
+          {settledTo === "ACCOUNT" && (
+            <label style={labelStyle}>
+              Due Date
+              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} style={fieldStyle} />
+            </label>
+          )}
 
           {settledTo === "PAID_NOW" && (
             <label style={labelStyle}>

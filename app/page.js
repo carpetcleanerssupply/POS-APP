@@ -1,41 +1,58 @@
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { isOwnerManager } from "@/lib/authz";
+import { isLowStock } from "@/lib/items";
+import { daysOverdue } from "@/lib/dashboard";
+import DashboardActivityLog from "./DashboardActivityLog";
+import DashboardEmployees from "./DashboardEmployees";
 
-// Live database status on every request, not baked in at build time.
 export const dynamic = "force-dynamic";
 
-async function checkDatabase() {
-  try {
-    const userCount = await prisma.user.count();
-    return { connected: true, userCount };
-  } catch (error) {
-    return { connected: false, error: error.message };
-  }
-}
+const tile = { backgroundColor: "#f7f7f7", border: "1px solid #ddd", borderRadius: 8, padding: "1rem" };
+const tileLabel = { fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#777", marginBottom: "0.25rem" };
+const tileValue = { fontSize: "1.6rem", fontWeight: 700, fontFamily: "monospace" };
+const tileSub = { fontSize: "0.75rem", color: "#777", marginTop: "0.25rem" };
 
 export default async function Home() {
   const session = await requireSession();
-  const db = await checkDatabase();
+  const owner = isOwnerManager(session);
+
+  const [accountInvoices, allItems, openPOCount, users, activityRaw] = await Promise.all([
+    prisma.invoice.findMany({ where: { status: "CLOSED", settledTo: "ACCOUNT" } }),
+    prisma.item.findMany(),
+    prisma.purchaseOrder.count({ where: { status: { in: ["ORDERED", "PARTIAL"] } } }),
+    prisma.user.findMany({ orderBy: { name: "asc" } }),
+    prisma.activityLog.findMany({ orderBy: { timestamp: "desc" }, take: 200, include: { user: true } }),
+  ]);
+
+  const openInvoices = accountInvoices.filter((inv) => Number(inv.total) - Number(inv.paidAmount) > 0.005);
+  const totalAR = openInvoices.reduce((sum, inv) => sum + (Number(inv.total) - Number(inv.paidAmount)), 0);
+  const overdueCount = openInvoices.filter((inv) => inv.dueDate && daysOverdue(inv.dueDate) > 0).length;
+  const lowStockItems = allItems.filter(isLowStock);
+
+  const activityEntries = activityRaw.map((a) => ({
+    id: a.id,
+    timestamp: a.timestamp,
+    action: a.action,
+    userName: a.user?.name || null,
+    detailsText: a.details && typeof a.details === "object" ? Object.entries(a.details).map(([k, v]) => `${k}: ${v}`).join(", ") : null,
+  }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 640 }}>
+    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <h1>Carpet Cleaners Supply — POS</h1>
           <p>
-            Signed in as <strong>{session.user.name}</strong>{" "}
-            ({session.user.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"})
+            Signed in as <strong>{session.user.name}</strong> ({owner ? "Owner/Manager" : "Staff"})
           </p>
         </div>
         <form action="/api/auth/logout" method="POST">
-          <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>
-            Sign out
-          </button>
+          <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Sign out</button>
         </form>
       </div>
-      <p>Pipeline check: code → Vercel → live database.</p>
 
-      <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem" }}>
+      <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
         <a href="/items">Items</a>
         <a href="/customers">Customers</a>
         <a href="/invoices">Invoices</a>
@@ -46,42 +63,54 @@ export default async function Home() {
         <a href="/purchase-orders">Purchase Orders</a>
       </nav>
 
-      <div
-        style={{
-          marginTop: "1.5rem",
-          padding: "1rem 1.25rem",
-          borderRadius: 8,
-          border: "1px solid",
-          borderColor: db.connected ? "#2e7d32" : "#c62828",
-          background: db.connected ? "#e8f5e9" : "#ffebee",
-        }}
-      >
-        {db.connected ? (
-          <>
-            <strong>Database connected.</strong>
-            <p style={{ margin: "0.5rem 0 0" }}>
-              Users table has {db.userCount} row{db.userCount === 1 ? "" : "s"}.
-            </p>
-          </>
-        ) : (
-          <>
-            <strong>Database not connected yet.</strong>
-            <p style={{ margin: "0.5rem 0 0" }}>
-              This is expected until a Postgres database is connected in Vercel
-              and its connection details are set as environment variables.
-            </p>
-            <pre
-              style={{
-                marginTop: "0.75rem",
-                whiteSpace: "pre-wrap",
-                fontSize: "0.85rem",
-                opacity: 0.8,
-              }}
-            >
-              {db.error}
-            </pre>
-          </>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", margin: "1.5rem 0" }}>
+        <div style={tile}>
+          <div style={tileLabel}>Overdue Invoices</div>
+          <div style={{ ...tileValue, color: overdueCount > 0 ? "#c62828" : "#2e7d32" }}>{overdueCount}</div>
+          <div style={tileSub}>past due date, unpaid</div>
+        </div>
+        <div style={tile}>
+          <div style={tileLabel}>Total A/R</div>
+          {owner ? (
+            <div style={{ ...tileValue, color: totalAR > 0 ? "#c62828" : "#2e7d32" }}>${totalAR.toFixed(2)}</div>
+          ) : (
+            <div style={tileValue}>{openInvoices.length}</div>
+          )}
+          <div style={tileSub}>{openInvoices.length} open invoice{openInvoices.length === 1 ? "" : "s"}</div>
+        </div>
+        <div style={tile}>
+          <div style={tileLabel}>Low Stock</div>
+          <div style={{ ...tileValue, color: lowStockItems.length > 0 ? "#c62828" : "#2e7d32" }}>{lowStockItems.length}</div>
+          <div style={tileSub}>item{lowStockItems.length === 1 ? "" : "s"} running low</div>
+        </div>
+        <div style={tile}>
+          <div style={tileLabel}>Open Purchase Orders</div>
+          <div style={tileValue}>{openPOCount}</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
+        {lowStockItems.length > 0 && (
+          <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
+            <h3 style={{ marginTop: 0 }}>Needs Reordering</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              {lowStockItems.slice(0, 8).map((i) => (
+                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
+                  <span>{i.name} <span style={{ color: "#777", fontSize: "0.8rem" }}>({i.sku})</span></span>
+                  <span style={{ color: "#c62828" }}>{i.stock} left</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
+
+        <DashboardActivityLog entries={JSON.parse(JSON.stringify(activityEntries))} />
+
+        <DashboardEmployees
+          users={users.map((u) => ({ id: u.id, name: u.name, tier: u.tier, active: u.active }))}
+          canManage={owner}
+          currentUserId={session.user.id}
+        />
       </div>
     </main>
   );
