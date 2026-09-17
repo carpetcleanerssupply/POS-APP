@@ -38,6 +38,7 @@ export default async function Home() {
       <nav style={{ margin: "1rem 0", display: "flex", gap: "1rem" }}>
         <a href="/items">Items</a>
         <a href="/customers">Customers</a>
+        <a href="/invoices">Invoices</a>
       </nav>
 
       <div
