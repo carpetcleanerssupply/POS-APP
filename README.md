@@ -7,6 +7,12 @@ Built with Next.js (App Router), Prisma, and Postgres (Neon, via Vercel's
 Marketplace integration). Deployed on Vercel at
 `carpet-cleaner-s-supply/pos-app`.
 
+**`staging` branch:** a long-lived branch deployed separately from
+Production, used for real-world user-acceptance testing before go-live. It
+gets its own isolated Neon database branch (via Preview Branching), so real
+items/customers can be entered there freely without touching Production
+data. Merge `staging` into `main` (or cherry-pick) once testing wraps up.
+
 ## Features
 
 - **Login** — username/password, session cookies, two tiers (Owner/Manager,
