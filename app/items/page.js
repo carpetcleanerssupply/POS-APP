@@ -40,9 +40,13 @@ export default async function ItemsPage({ searchParams }) {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Items</h1>
-        <a href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-          + Add Item
-        </a>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <a href="/api/items/export">Export CSV</a>
+          <a href="/items/import">Import CSV</a>
+          <a href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+            + Add Item
+          </a>
+        </div>
       </div>
 
       {errorMessage && (
