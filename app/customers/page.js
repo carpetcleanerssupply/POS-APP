@@ -38,9 +38,13 @@ export default async function CustomersPage({ searchParams }) {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Customers</h1>
-        <a href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-          + Add Customer
-        </a>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <a href="/api/customers/export">Export CSV</a>
+          <a href="/customers/import">Import CSV</a>
+          <a href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1a1a1a", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
+            + Add Customer
+          </a>
+        </div>
       </div>
 
       {errorMessage && (
