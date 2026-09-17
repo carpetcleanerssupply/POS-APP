@@ -26,7 +26,8 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
       {customer && (
         <p style={{ color: "#555" }}>
           Balance: <strong>${Number(customer.balance).toFixed(2)}</strong>{" "}
-          <a href={`/payments/new?customerId=${customer.id}`}>Record Payment</a>
+          <a href={`/payments/new?customerId=${customer.id}`}>Record Payment</a>{" "}
+          &middot; <a href={`/customers/${customer.id}/statement`}>Account Statement</a>
         </p>
       )}
 
