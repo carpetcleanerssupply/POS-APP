@@ -7,10 +7,14 @@ export async function GET() {
 
   const payments = await prisma.payment.findMany({
     orderBy: { date: "desc" },
-    include: { recordedBy: true },
+    include: { recordedBy: true, applications: { include: { invoice: true } } },
   });
 
-  const rows = payments.map((p) => ({ ...p, recordedByName: p.recordedBy?.name || "" }));
+  const rows = payments.map((p) => ({
+    ...p,
+    recordedByName: p.recordedBy?.name || "",
+    appliedTo: p.applications.map((a) => `#${a.invoice.number}`).join(", "),
+  }));
   const csv = paymentsToCsv(rows);
 
   return new Response(csv, {

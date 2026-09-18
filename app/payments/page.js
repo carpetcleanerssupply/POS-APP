@@ -14,7 +14,11 @@ export default async function PaymentsPage() {
   const session = await requireSession();
   const canVoid = isOwnerManager(session);
 
-  const payments = await prisma.payment.findMany({ orderBy: { date: "desc" }, take: 200 });
+  const payments = await prisma.payment.findMany({
+    orderBy: { date: "desc" },
+    take: 200,
+    include: { applications: { include: { invoice: true } } },
+  });
 
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
@@ -36,6 +40,7 @@ export default async function PaymentsPage() {
             <th style={th}>Date</th>
             <th style={th}>Customer</th>
             <th style={th}>Method</th>
+            <th style={th}>Applied To</th>
             <th style={{ ...th, textAlign: "right" }}>Amount</th>
             <th style={{ ...th, textAlign: "right" }}>Unapplied</th>
             <th style={th}>Status</th>
@@ -48,6 +53,11 @@ export default async function PaymentsPage() {
               <td style={td}>{new Date(p.date).toLocaleDateString()}</td>
               <td style={td}>{p.customerName}</td>
               <td style={td}>{paymentMethodLabel(p.method, p.checkNumber)}{p.creditSourceLabel ? ` (${p.creditSourceLabel})` : ""}</td>
+              <td style={td}>
+                {p.applications.length > 0
+                  ? p.applications.map((a) => `#${a.invoice.number}`).join(", ")
+                  : "—"}
+              </td>
               <td style={{ ...td, textAlign: "right" }}>${Number(p.amount).toFixed(2)}</td>
               <td style={{ ...td, textAlign: "right" }}>{Number(p.unapplied) > 0.005 ? `$${Number(p.unapplied).toFixed(2)}` : "—"}</td>
               <td style={td}>{p.voided ? "Voided" : p.atSale ? "At Sale" : "—"}</td>
@@ -56,7 +66,7 @@ export default async function PaymentsPage() {
           ))}
           {payments.length === 0 && (
             <tr>
-              <td style={td} colSpan={canVoid ? 7 : 6}>No payments yet.</td>
+              <td style={td} colSpan={canVoid ? 8 : 7}>No payments yet.</td>
             </tr>
           )}
         </tbody>

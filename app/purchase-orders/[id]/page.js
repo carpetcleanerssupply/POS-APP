@@ -25,6 +25,7 @@ export default async function PurchaseOrderDetailPage({ params }) {
   if (!po) notFound();
 
   const total = poTotal(po.lines);
+  const plainLines = po.lines.map((l) => ({ ...l, cost: Number(l.cost) }));
 
   const emailBodyLines = [
     `Purchase Order #${po.number} from ${COMPANY.name}`,
@@ -63,20 +64,22 @@ export default async function PurchaseOrderDetailPage({ params }) {
             <th style={th}>SKU</th>
             <th style={th}>Item</th>
             <th style={th}>Ordered</th>
+            <th style={th}>= Pieces</th>
             <th style={th}>Received</th>
             <th style={th}>Cost</th>
             <th style={{ ...th, textAlign: "right" }}>Ext</th>
           </tr>
         </thead>
         <tbody>
-          {po.lines.map((l) => (
+          {plainLines.map((l) => (
             <tr key={l.id}>
               <td style={td}>{l.sku}</td>
               <td style={td}>{l.name}</td>
               <td style={td}>{l.qtyOrdered}</td>
+              <td style={td}>{l.qtyOrdered * (l.caseQty || 1)}</td>
               <td style={td}>{l.qtyReceived}</td>
-              <td style={td}>${Number(l.cost).toFixed(2)}</td>
-              <td style={{ ...td, textAlign: "right" }}>${(l.qtyOrdered * Number(l.cost)).toFixed(2)}</td>
+              <td style={td}>${l.cost.toFixed(2)}</td>
+              <td style={{ ...td, textAlign: "right" }}>${(l.qtyOrdered * l.cost).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
@@ -98,7 +101,11 @@ export default async function PurchaseOrderDetailPage({ params }) {
       </p>
 
       <div className="no-print">
-        <PODetailActions po={po} lines={po.lines} canUnmarkPaid={isOwnerManager(session)} />
+        <PODetailActions
+          po={{ id: po.id, status: po.status, paid: po.paid, checkNumber: po.checkNumber }}
+          lines={plainLines}
+          canUnmarkPaid={isOwnerManager(session)}
+        />
       </div>
     </main>
   );

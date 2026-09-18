@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
+import { vendorBalanceDue } from "@/lib/vendors";
 import VendorForm from "../../VendorForm";
 
 export default async function EditVendorPage({ params, searchParams }) {
@@ -12,11 +13,13 @@ export default async function EditVendorPage({ params, searchParams }) {
   const vendor = await prisma.vendor.findUnique({ where: { id } });
   if (!vendor) notFound();
 
+  const balanceDue = await vendorBalanceDue(prisma, vendor);
+
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 640 }}>
       <p><Link href="/vendors">&larr; Back to Vendors</Link></p>
       <h1>Edit Vendor — {vendor.name}</h1>
-      <VendorForm action={`/api/vendors/${id}`} vendor={vendor} error={query?.error} submitLabel="Save Changes" />
+      <VendorForm action={`/api/vendors/${id}`} vendor={vendor} error={query?.error} submitLabel="Save Changes" balanceDue={balanceDue} />
     </main>
   );
 }

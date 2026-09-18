@@ -19,17 +19,20 @@ export default async function CustomersPage({ searchParams }) {
   const params = await searchParams;
   const q = (params?.q || "").trim().toLowerCase();
 
+  const dueOnly = params?.due === "1";
   const allCustomers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
 
-  const customers = allCustomers.filter((c) => {
-    if (!q) return true;
-    return (
-      displayName(c).toLowerCase().includes(q) ||
-      (c.email || "").toLowerCase().includes(q) ||
-      (c.workPhone || "").includes(q) ||
-      (c.cellPhone || "").includes(q)
-    );
-  });
+  const matchesQuery = (c) =>
+    !q ||
+    displayName(c).toLowerCase().includes(q) ||
+    (c.email || "").toLowerCase().includes(q) ||
+    (c.workPhone || "").includes(q) ||
+    (c.cellPhone || "").includes(q);
+
+  const owingCustomers = allCustomers.filter((c) => Number(c.balance) > 0.005).sort((a, b) => Number(b.balance) - Number(a.balance));
+  const totalOwed = owingCustomers.reduce((sum, c) => sum + Number(c.balance), 0);
+
+  const customers = (dueOnly ? owingCustomers : allCustomers).filter(matchesQuery);
 
   const errorMessage = params?.error && DELETE_ERROR_MESSAGES[params.error]?.(params);
 
@@ -41,6 +44,7 @@ export default async function CustomersPage({ searchParams }) {
         <h1>Customers</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
           <Link href="/api/customers/export">Export CSV</Link>
+          <Link href="/api/customers/mailing-list">Export Mailing List</Link>
           <Link href="/customers/import">Import CSV</Link>
           <Link href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Customer
@@ -63,6 +67,21 @@ export default async function CustomersPage({ searchParams }) {
           style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
         />
         <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Search</button>
+        {dueOnly && <input type="hidden" name="due" value="1" />}
+        <Link
+          href={dueOnly ? `/customers${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/customers?due=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
+          style={{
+            padding: "0.5rem 0.9rem",
+            borderRadius: 6,
+            border: "1px solid #c62828",
+            color: dueOnly ? "#fff" : "#c62828",
+            background: dueOnly ? "#c62828" : "transparent",
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {dueOnly ? "Showing Statements Due" : `Statements Due (${owingCustomers.length}) — $${totalOwed.toFixed(2)}`}
+        </Link>
       </form>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -84,6 +103,7 @@ export default async function CustomersPage({ searchParams }) {
               <td style={td}>${Number(c.balance).toFixed(2)}</td>
               <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
                 <Link href={`/customers/${c.id}/edit`}>Edit</Link>
+                <Link href={`/customers/${c.id}/statement`}>Statement</Link>
                 <DeleteCustomerButton customerId={c.id} customerName={displayName(c)} />
               </td>
             </tr>
@@ -91,7 +111,11 @@ export default async function CustomersPage({ searchParams }) {
           {customers.length === 0 && (
             <tr>
               <td style={td} colSpan={5}>
-                {allCustomers.length === 0 ? "No customers yet." : "No customers match your search."}
+                {allCustomers.length === 0
+                  ? "No customers yet."
+                  : dueOnly
+                  ? "Nobody currently owes a balance."
+                  : "No customers match your search."}
               </td>
             </tr>
           )}

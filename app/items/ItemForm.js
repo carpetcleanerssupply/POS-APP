@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 const ERROR_MESSAGES = {
   required: "SKU and Item Name are required.",
@@ -9,8 +12,27 @@ const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginT
 const rowStyle = { display: "flex", gap: "1rem" };
 const labelStyle = { flex: 1, fontSize: "0.9rem" };
 
+function currency(n) {
+  return `$${Number(n || 0).toFixed(2)}`;
+}
+
 export default function ItemForm({ action, item, error, submitLabel }) {
   const v = (key, fallback = "") => item?.[key] ?? fallback;
+
+  const [cost, setCost] = useState(v("cost", 0));
+  const [price, setPrice] = useState(v("price", 0));
+  const [priceBumpPct, setPriceBumpPct] = useState("");
+
+  const profit = (Number(price) || 0) - (Number(cost) || 0);
+  const margin = Number(price) > 0 ? (profit / Number(price)) * 100 : null;
+
+  function bumpPrice() {
+    const pct = Number(priceBumpPct);
+    if (!pct) return;
+    const cur = Number(price) || 0;
+    setPrice(Math.round(cur * (1 + pct / 100) * 100) / 100);
+    setPriceBumpPct("");
+  }
 
   return (
     <div style={{ maxWidth: 560 }}>
@@ -46,12 +68,33 @@ export default function ItemForm({ action, item, error, submitLabel }) {
         <div style={rowStyle}>
           <label style={labelStyle}>
             Cost
-            <input name="cost" type="number" step="0.01" min="0" defaultValue={v("cost", 0)} style={fieldStyle} />
+            <input name="cost" type="number" step="0.01" min="0" value={cost} onChange={(e) => setCost(e.target.value)} style={fieldStyle} />
           </label>
           <label style={labelStyle}>
             Price
-            <input name="price" type="number" step="0.01" min="0" defaultValue={v("price", 0)} style={fieldStyle} />
+            <input name="price" type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} style={fieldStyle} />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.4rem" }}>
+              <input
+                type="number"
+                placeholder="%"
+                value={priceBumpPct}
+                onChange={(e) => setPriceBumpPct(e.target.value)}
+                style={{ width: 60, padding: "0.3rem", fontSize: "0.8rem" }}
+              />
+              <button
+                type="button"
+                onClick={bumpPrice}
+                style={{ fontSize: "0.75rem", padding: "0.3rem 0.5rem", cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                Increase price by %
+              </button>
+            </div>
           </label>
+        </div>
+
+        <div style={{ fontSize: "0.85rem", color: profit >= 0 ? "#2e7d32" : "#c62828" }}>
+          Profit: {currency(profit)}
+          {margin != null && <span style={{ color: "#777" }}> ({margin.toFixed(1)}% margin)</span>}
         </div>
 
         <div style={rowStyle}>

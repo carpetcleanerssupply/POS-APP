@@ -108,23 +108,30 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
               </tr>
             </thead>
             <tbody>
-              {receivableLines.map((l) => (
-                <tr key={l.id}>
-                  <td>{l.name} ({l.sku})</td>
-                  <td>{l.qtyOrdered}</td>
-                  <td>{l.qtyReceived}</td>
-                  <td>
-                    <input
-                      type="number"
-                      min="0"
-                      max={l.qtyOrdered - l.qtyReceived}
-                      value={receiveQtys[l.id] || ""}
-                      onChange={(e) => setReceiveQtys((prev) => ({ ...prev, [l.id]: e.target.value }))}
-                      style={{ width: 70, padding: "0.3rem" }}
-                    />
-                  </td>
-                </tr>
-              ))}
+              {receivableLines.map((l) => {
+                const caseQty = l.caseQty || 1;
+                const receiveNow = Number(receiveQtys[l.id]) || 0;
+                return (
+                  <tr key={l.id}>
+                    <td>{l.name} ({l.sku})</td>
+                    <td>{l.qtyOrdered}</td>
+                    <td>{l.qtyReceived}</td>
+                    <td>
+                      <input
+                        type="number"
+                        min="0"
+                        max={l.qtyOrdered - l.qtyReceived}
+                        value={receiveQtys[l.id] || ""}
+                        onChange={(e) => setReceiveQtys((prev) => ({ ...prev, [l.id]: e.target.value }))}
+                        style={{ width: 70, padding: "0.3rem" }}
+                      />
+                      {caseQty > 1 && receiveNow > 0 && (
+                        <div style={{ fontSize: "0.75rem", color: "#777", marginTop: "0.2rem" }}>= {receiveNow * caseQty} pcs</div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           <button

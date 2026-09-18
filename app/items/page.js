@@ -2,16 +2,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isLowStock, lowStockThreshold, casesPlusEach } from "@/lib/items";
-import DeleteItemButton from "./DeleteItemButton";
+import ItemsTable from "./ItemsTable";
 
 const DELETE_ERROR_MESSAGES = {
   in_use: (count) =>
     `Can't delete — this item appears on ${count} existing invoice, estimate, or PO. Consider setting stock to 0 or renaming it instead.`,
   not_found: () => "That item no longer exists.",
 };
-
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
 
 export default async function ItemsPage({ searchParams }) {
   await requireSession();
@@ -82,55 +79,26 @@ export default async function ItemsPage({ searchParams }) {
         </Link>
       </form>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={th}>SKU</th>
-            <th style={th}>Name</th>
-            <th style={th}>Category</th>
-            <th style={th}>Vendor</th>
-            <th style={th}>Cost</th>
-            <th style={th}>Price</th>
-            <th style={th}>Unit</th>
-            <th style={th}>Units/Case</th>
-            <th style={th}>Stock</th>
-            <th style={th} title="Cases + individual units — a case-friendly read on Stock, for whoever's counting shelves">CS+EA</th>
-            <th style={th}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td style={td}>{item.sku}</td>
-              <td style={td}>{item.name}</td>
-              <td style={td}>{item.category || "—"}</td>
-              <td style={td}>{item.vendorName || "—"}</td>
-              <td style={td}>${Number(item.cost).toFixed(2)}</td>
-              <td style={td}>${Number(item.price).toFixed(2)}</td>
-              <td style={td}>{item.unit || "—"}</td>
-              <td style={td}>{(item.caseQty || 1) > 1 ? item.caseQty : "—"}</td>
-              <td style={td}>
-                {item.stock}
-                {isLowStock(item) && (
-                  <span title={`At or below ${lowStockThreshold(item)}`}> ⚠</span>
-                )}
-              </td>
-              <td style={td}>{casesPlusEach(item) || "—"}</td>
-              <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                <Link href={`/items/${item.id}/edit`}>Edit</Link>
-                <DeleteItemButton itemId={item.id} itemName={item.name} />
-              </td>
-            </tr>
-          ))}
-          {items.length === 0 && (
-            <tr>
-              <td style={td} colSpan={11}>
-                {allItems.length === 0 ? "No items yet." : "No items match your filters."}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {allItems.length === 0 ? (
+        <p>No items yet.</p>
+      ) : (
+        <ItemsTable
+          items={items.map((item) => ({
+            id: item.id,
+            sku: item.sku,
+            name: item.name,
+            category: item.category,
+            vendorName: item.vendorName,
+            cost: Number(item.cost),
+            price: Number(item.price),
+            unit: item.unit,
+            caseQty: item.caseQty || 1,
+            stock: item.stock,
+            lowStockTitle: isLowStock(item) ? `At or below ${lowStockThreshold(item)}` : null,
+            casesPlusEach: casesPlusEach(item),
+          }))}
+        />
+      )}
     </main>
   );
 }
