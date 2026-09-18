@@ -69,7 +69,7 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
 
         {!po.paid && (
           <>
-            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)} style={{ padding: "0.3rem" }}>
+            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)} style={{ padding: "0.5rem" }}>
               <option value="CARD">Card</option>
               <option value="CHECK">Check</option>
               <option value="CASH">Cash</option>

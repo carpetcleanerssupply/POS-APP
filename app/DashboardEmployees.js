@@ -66,7 +66,7 @@ export default function DashboardEmployees({ users, canManage, currentUserId }) 
         <form onSubmit={addUser} style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1rem" }}>
           <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} style={{ padding: "0.4rem" }} required />
           <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: "0.4rem" }} required />
-          <select value={tier} onChange={(e) => setTier(e.target.value)} style={{ padding: "0.4rem" }}>
+          <select value={tier} onChange={(e) => setTier(e.target.value)} style={{ padding: "0.5rem" }}>
             <option value="STAFF">Staff</option>
             <option value="OWNER_MANAGER">Owner/Manager</option>
           </select>
