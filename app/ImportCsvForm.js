@@ -55,7 +55,7 @@ export default function ImportCsvForm({ action, noun = "row" }) {
         </p>
       )}
       <input type="file" accept=".csv" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-      <button type="submit" disabled={busy} style={{ padding: "0.5rem 1rem", cursor: "pointer", alignSelf: "flex-start" }}>
+      <button type="submit" className="btn btn-primary" disabled={busy} style={{ alignSelf: "flex-start" }}>
         {busy ? "Importing..." : "Import"}
       </button>
     </form>

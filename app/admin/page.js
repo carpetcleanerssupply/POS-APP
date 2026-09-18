@@ -19,6 +19,7 @@ export default async function AdminPage() {
       <h1>Admin Tools</h1>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", margin: "1.5rem 0" }}>
+        <Link href="/reports/sales">Sales Report</Link>
         <Link href="/reports/ar-aging">A/R Aging</Link>
         <Link href="/reports/inventory-valuation">Inventory Valuation</Link>
       </div>

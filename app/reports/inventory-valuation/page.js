@@ -35,7 +35,7 @@ export default async function InventoryValuationPage() {
       <p><Link href="/admin">&larr; Admin</Link></p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Inventory Valuation</h1>
-        <Link href="/api/reports/inventory-valuation/export">Export CSV</Link>
+        <Link href="/api/reports/inventory-valuation/export" className="btn btn-sm">Export CSV</Link>
       </div>
       <p style={{ fontWeight: 700 }}>
         Total: ${grandTotal.toFixed(2)} across {grandUnits} unit{grandUnits === 1 ? "" : "s"}

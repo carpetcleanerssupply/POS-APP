@@ -2,7 +2,7 @@
 
 export default function PrintButton({ label = "Print" }) {
   return (
-    <button type="button" onClick={() => window.print()} style={{ cursor: "pointer" }}>
+    <button type="button" className="btn btn-sm" onClick={() => window.print()}>
       {label}
     </button>
   );

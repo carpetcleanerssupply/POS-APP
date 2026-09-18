@@ -30,8 +30,8 @@ export default async function VendorsPage({ searchParams }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Vendors</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/api/vendors/export">Export CSV</Link>
-          <Link href="/vendors/import">Import CSV</Link>
+          <Link href="/api/vendors/export" className="btn btn-sm">Export CSV</Link>
+          <Link href="/vendors/import" className="btn btn-sm">Import CSV</Link>
           <Link href="/vendors/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Vendor
           </Link>
@@ -46,7 +46,7 @@ export default async function VendorsPage({ searchParams }) {
 
       <form method="GET" style={{ display: "flex", gap: "0.75rem", margin: "1.25rem 0" }}>
         <input type="text" name="q" defaultValue={params?.q || ""} placeholder="Search name or email..." style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }} />
-        <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Search</button>
+        <button type="submit" className="btn btn-sm">Search</button>
       </form>
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>

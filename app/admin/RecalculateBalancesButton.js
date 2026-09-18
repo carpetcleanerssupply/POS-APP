@@ -22,7 +22,7 @@ export default function RecalculateBalancesButton() {
 
   return (
     <div>
-      <button type="button" disabled={busy} onClick={run} style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
+      <button type="button" className="btn btn-primary" disabled={busy} onClick={run}>
         {busy ? "Recalculating..." : "Recalculate Balances"}
       </button>
       {result?.error && <p style={{ color: "#c62828" }}>{result.error}</p>}

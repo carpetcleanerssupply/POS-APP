@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { buildMailtoUrl } from "@/lib/mailto";
 import { COMPANY } from "@/lib/company";
+import DocumentLetterhead from "../../DocumentLetterhead";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
 
@@ -52,6 +53,8 @@ export default async function EstimateDetailPage({ params }) {
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
       <p className="no-print"><Link href="/estimates">&larr; Back to Estimates</Link></p>
+
+      <DocumentLetterhead />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Estimate #{estimate.number}</h1>

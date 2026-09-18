@@ -38,7 +38,7 @@ export default function DashboardActivityLog({ entries }) {
     <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h3 style={{ marginTop: 0 }}>Activity Log</h3>
-        <button type="button" onClick={() => setShow((s) => !s)} style={{ cursor: "pointer" }}>
+        <button type="button" className="btn btn-sm" onClick={() => setShow((s) => !s)}>
           {show ? "Hide" : "View Activity Log"}
         </button>
       </div>
@@ -53,12 +53,12 @@ export default function DashboardActivityLog({ entries }) {
               To <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={{ padding: "0.3rem" }} />
             </label>
             {(from || to) && (
-              <button type="button" onClick={() => { setFrom(""); setTo(""); }} style={{ cursor: "pointer", fontSize: "0.85rem" }}>
+              <button type="button" className="btn btn-sm" onClick={() => { setFrom(""); setTo(""); }}>
                 Clear
               </button>
             )}
             {filtered.length > 0 && (
-              <button type="button" onClick={exportCsv} style={{ cursor: "pointer", fontSize: "0.85rem", marginLeft: "auto" }}>
+              <button type="button" className="btn btn-sm" onClick={exportCsv} style={{ marginLeft: "auto" }}>
                 Export CSV
               </button>
             )}

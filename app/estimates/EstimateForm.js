@@ -119,7 +119,7 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" onClick={addLine} style={{ padding: "0 1rem", cursor: "pointer" }}>
+          <button type="button" className="btn btn-sm" onClick={addLine}>
             Add
           </button>
         </div>
@@ -196,10 +196,10 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
       </div>
 
       <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+        <button type="submit" className="btn btn-primary" disabled={submitting}>
           {submitting ? "Saving..." : "Save Estimate"}
         </button>
-        <Link href="/estimates" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
+        <Link href="/estimates" className="btn">
           Cancel
         </Link>
       </div>

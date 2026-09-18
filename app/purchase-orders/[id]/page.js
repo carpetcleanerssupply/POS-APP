@@ -6,6 +6,7 @@ import { isOwnerManager } from "@/lib/authz";
 import { poTotal } from "@/lib/purchaseOrders";
 import { buildMailtoUrl } from "@/lib/mailto";
 import { COMPANY } from "@/lib/company";
+import DocumentLetterhead from "../../DocumentLetterhead";
 import PODetailActions from "../PODetailActions";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
@@ -48,6 +49,8 @@ export default async function PurchaseOrderDetailPage({ params }) {
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
       <p className="no-print"><Link href="/purchase-orders">&larr; Back to Purchase Orders</Link></p>
+
+      <DocumentLetterhead />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>PO #{po.number}</h1>

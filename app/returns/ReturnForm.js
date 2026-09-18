@@ -123,7 +123,7 @@ export default function ReturnForm({ invoiceId, lines }) {
         <input value={reason} onChange={(e) => setReason(e.target.value)} style={{ display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" }} />
       </label>
 
-      <button type="submit" disabled={busy || lines.length === 0} style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
+      <button type="submit" className="btn btn-primary" disabled={busy || lines.length === 0}>
         {busy ? "Saving..." : "Process Return"}
       </button>
     </form>

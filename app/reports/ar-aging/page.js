@@ -28,7 +28,7 @@ export default async function ARAgingPage() {
       <p><Link href="/admin">&larr; Admin</Link></p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>A/R Aging</h1>
-        <Link href="/api/reports/ar-aging/export">Export CSV</Link>
+        <Link href="/api/reports/ar-aging/export" className="btn btn-sm">Export CSV</Link>
       </div>
 
       {rows.length === 0 ? (

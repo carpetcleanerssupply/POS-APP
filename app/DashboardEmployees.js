@@ -54,7 +54,7 @@ export default function DashboardEmployees({ users, canManage, currentUserId }) 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h3 style={{ marginTop: 0 }}>Employees</h3>
         {canManage && (
-          <button type="button" onClick={() => setShowAdd((s) => !s)} style={{ cursor: "pointer" }}>
+          <button type="button" className="btn btn-sm" onClick={() => setShowAdd((s) => !s)}>
             {showAdd ? "Cancel" : "+ Add"}
           </button>
         )}
@@ -71,7 +71,7 @@ export default function DashboardEmployees({ users, canManage, currentUserId }) 
             <option value="OWNER_MANAGER">Owner/Manager</option>
           </select>
           <input type="password" placeholder="Temporary password (min 8 chars)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: "0.4rem" }} required minLength={8} />
-          <button type="submit" disabled={busy} style={{ padding: "0.4rem", cursor: "pointer" }}>Create Login</button>
+          <button type="submit" className="btn btn-primary btn-sm" disabled={busy} style={{ alignSelf: "flex-start" }}>Create Login</button>
         </form>
       )}
 
@@ -83,7 +83,12 @@ export default function DashboardEmployees({ users, canManage, currentUserId }) 
               {!u.active && " — inactive"}
             </span>
             {canManage && u.id !== currentUserId && (
-              <button type="button" disabled={busy} onClick={() => setActive(u.id, !u.active)} style={{ cursor: "pointer", fontSize: "0.85rem" }}>
+              <button
+                type="button"
+                className={`btn btn-sm ${u.active ? "btn-danger" : ""}`}
+                disabled={busy}
+                onClick={() => setActive(u.id, !u.active)}
+              >
                 {u.active ? "Deactivate" : "Reactivate"}
               </button>
             )}

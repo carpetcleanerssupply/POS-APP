@@ -120,7 +120,7 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" onClick={addLine} style={{ padding: "0 1rem", cursor: "pointer" }}>
+          <button type="button" className="btn btn-sm" onClick={addLine}>
             Add
           </button>
         </div>
@@ -174,10 +174,10 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
       <div style={{ fontWeight: 700, fontSize: "1.1rem", textAlign: "right" }}>PO Total: {currency(total)}</div>
 
       <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="submit" disabled={submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+        <button type="submit" className="btn btn-primary" disabled={submitting}>
           {submitting ? "Saving..." : poId ? "Save Changes" : "Create Draft PO"}
         </button>
-        <Link href="/purchase-orders" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>Cancel</Link>
+        <Link href="/purchase-orders" className="btn">Cancel</Link>
       </div>
     </form>
   );
