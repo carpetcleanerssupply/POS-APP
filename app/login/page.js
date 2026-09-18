@@ -3,6 +3,7 @@ import Image from "next/image";
 const ERROR_MESSAGES = {
   missing: "Enter a username and password.",
   invalid: "Incorrect username or password.",
+  locked: "Too many failed attempts. This login is temporarily locked — try again in 15 minutes.",
 };
 
 export default async function LoginPage({ searchParams }) {
@@ -61,10 +62,7 @@ export default async function LoginPage({ searchParams }) {
             style={{ display: "block", width: "100%", padding: "0.55rem", marginTop: "0.25rem" }}
           />
         </label>
-        <button
-          type="submit"
-          style={{ padding: "0.65rem", marginTop: "0.5rem", cursor: "pointer" }}
-        >
+        <button type="submit" className="btn btn-primary" style={{ marginTop: "0.5rem" }}>
           Sign in
         </button>
       </form>
