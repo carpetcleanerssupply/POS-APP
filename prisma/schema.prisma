@@ -58,6 +58,9 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
   sessions           Session[]
   invoicesAsEmployee Invoice[]       @relation("InvoiceEmployee")
   invoicesCreated    Invoice[]       @relation("InvoiceCreatedBy")
