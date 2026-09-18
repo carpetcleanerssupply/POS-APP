@@ -10,7 +10,7 @@ const rowStyle = { display: "flex", gap: "1rem" };
 const labelStyle = { flex: 1, fontSize: "0.9rem" };
 const sectionStyle = { marginTop: "1.5rem", marginBottom: "0.5rem", fontSize: "1rem", fontWeight: 600 };
 
-export default function VendorForm({ action, vendor, error, submitLabel }) {
+export default function VendorForm({ action, vendor, error, submitLabel, balanceDue }) {
   const v = (key, fallback = "") => vendor?.[key] ?? fallback;
 
   return (
@@ -18,6 +18,12 @@ export default function VendorForm({ action, vendor, error, submitLabel }) {
       {error && ERROR_MESSAGES[error] && (
         <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
           {ERROR_MESSAGES[error]}
+        </p>
+      )}
+
+      {vendor && (
+        <p style={{ color: "#555" }}>
+          Balance Due: <strong>${Number(balanceDue || 0).toFixed(2)}</strong>
         </p>
       )}
 

@@ -74,6 +74,9 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
           <input type="checkbox" name="unsubscribed" defaultChecked={v("unsubscribed", false)} /> Unsubscribed from
           email
         </label>
+        <label>
+          <input type="checkbox" name="webCustomer" defaultChecked={v("webCustomer", false)} /> Web Customer
+        </label>
 
         <div style={sectionStyle}>Billing Address</div>
         <label>

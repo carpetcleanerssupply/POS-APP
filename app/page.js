@@ -5,6 +5,7 @@ import { isLowStock } from "@/lib/items";
 import { daysOverdue } from "@/lib/dashboard";
 import DashboardActivityLog from "./DashboardActivityLog";
 import DashboardEmployees from "./DashboardEmployees";
+import CreatePOsFromLowStockButton from "./CreatePOsFromLowStockButton";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,10 @@ export default async function Home() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
         {lowStockItems.length > 0 && (
           <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-            <h3 style={{ marginTop: 0 }}>Needs Reordering</h3>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.4rem" }}>
+              <h3 style={{ margin: 0 }}>Needs Reordering</h3>
+              <CreatePOsFromLowStockButton />
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
               {lowStockItems.slice(0, 8).map((i) => (
                 <div key={i.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
