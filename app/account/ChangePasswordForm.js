@@ -89,7 +89,7 @@ export default function ChangePasswordForm() {
           style={fieldStyle}
         />
       </label>
-      <button type="submit" disabled={busy} style={{ padding: "0.6rem 1.2rem", cursor: "pointer", alignSelf: "flex-start" }}>
+      <button type="submit" className="btn btn-primary" disabled={busy} style={{ alignSelf: "flex-start" }}>
         {busy ? "Saving..." : "Change Password"}
       </button>
     </form>

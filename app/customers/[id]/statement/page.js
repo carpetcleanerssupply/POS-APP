@@ -6,6 +6,7 @@ import { displayName } from "@/lib/customers";
 import { buildStatementLedger } from "@/lib/statement";
 import { buildMailtoUrl } from "@/lib/mailto";
 import { COMPANY } from "@/lib/company";
+import DocumentLetterhead from "../../../DocumentLetterhead";
 import PrintButton from "../../../PrintButton";
 import EmailButton from "../../../EmailButton";
 
@@ -63,6 +64,9 @@ export default async function CustomerStatementPage({ params }) {
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
       <p className="no-print"><Link href={`/customers/${id}/edit`}>&larr; Back to {name}</Link></p>
+
+      <DocumentLetterhead />
+
       <h1>Account Statement — {name}</h1>
       <p>
         Current Balance:{" "}

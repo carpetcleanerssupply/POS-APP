@@ -49,23 +49,23 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
         {po.status === "DRAFT" && (
           <>
-            <Link href={`/purchase-orders/${po.id}/edit`}>Edit</Link>
-            <button type="button" disabled={busy} onClick={() => call(`/api/purchase-orders/${po.id}/mark-ordered`)} style={{ cursor: "pointer" }}>
+            <Link href={`/purchase-orders/${po.id}/edit`} className="btn btn-sm">Edit</Link>
+            <button type="button" className="btn btn-sm" disabled={busy} onClick={() => call(`/api/purchase-orders/${po.id}/mark-ordered`)}>
               Mark Ordered
             </button>
             <button
               type="button"
+              className="btn btn-sm btn-danger"
               disabled={busy}
               onClick={() => {
                 if (confirm("Delete this draft PO?")) call(`/api/purchase-orders/${po.id}/delete`).then((ok) => ok && router.push("/purchase-orders"));
               }}
-              style={{ color: "#c62828", cursor: "pointer" }}
             >
               Delete
             </button>
           </>
         )}
-        {po.status === "ORDERED" && <Link href={`/purchase-orders/${po.id}/edit`}>Edit</Link>}
+        {po.status === "ORDERED" && <Link href={`/purchase-orders/${po.id}/edit`} className="btn btn-sm">Edit</Link>}
 
         {!po.paid && (
           <>
@@ -86,6 +86,7 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
         )}
         <button
           type="button"
+          className="btn btn-sm"
           disabled={busy || (po.paid && !canUnmarkPaid)}
           title={po.paid && !canUnmarkPaid ? "Unmarking as paid requires an Owner/Manager login" : undefined}
           onClick={() => call(`/api/purchase-orders/${po.id}/toggle-paid`, { method: payMethod, checkNumber: payCheckNumber })}
@@ -136,13 +137,14 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
           </table>
           <button
             type="button"
+            className="btn btn-primary"
             disabled={busy}
             onClick={() =>
               call(`/api/purchase-orders/${po.id}/receive`, {
                 receipts: Object.entries(receiveQtys).map(([lineId, qty]) => ({ lineId, qty })),
               }).then((ok) => ok && setReceiveQtys({}))
             }
-            style={{ marginTop: "0.75rem", padding: "0.5rem 1rem", cursor: "pointer" }}
+            style={{ marginTop: "0.75rem" }}
           >
             Receive
           </button>

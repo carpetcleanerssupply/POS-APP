@@ -144,10 +144,10 @@ export default function CustomerForm({ action, customer, error, saved, submitLab
         </label>
 
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          <button type="submit" style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
+          <button type="submit" className="btn btn-primary">
             {submitLabel}
           </button>
-          <Link href="/customers" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
+          <Link href="/customers" className="btn">
             Cancel
           </Link>
         </div>

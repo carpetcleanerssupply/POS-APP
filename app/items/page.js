@@ -39,8 +39,8 @@ export default async function ItemsPage({ searchParams }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Items</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/api/items/export">Export CSV</Link>
-          <Link href="/items/import">Import CSV</Link>
+          <Link href="/api/items/export" className="btn btn-sm">Export CSV</Link>
+          <Link href="/items/import" className="btn btn-sm">Import CSV</Link>
           <Link href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Item
           </Link>
@@ -62,7 +62,7 @@ export default async function ItemsPage({ searchParams }) {
           style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
         />
         {lowOnly && <input type="hidden" name="low" value="1" />}
-        <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Search</button>
+        <button type="submit" className="btn btn-sm">Search</button>
         <Link
           href={lowOnly ? `/items${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/items?low=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
           style={{

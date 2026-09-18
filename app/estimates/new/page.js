@@ -29,7 +29,7 @@ export default async function NewEstimatePage({ searchParams }) {
                 <option key={c.id} value={c.id}>{displayName(c)}</option>
               ))}
             </select>
-            <button type="submit" style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>Go</button>
+            <button type="submit" className="btn btn-sm">Go</button>
           </form>
         )}
       </main>

@@ -224,7 +224,7 @@ export default function NewInvoiceForm({
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" onClick={addLine} style={{ padding: "0 1rem", cursor: "pointer" }}>
+          <button type="button" className="btn btn-sm" onClick={addLine}>
             Add
           </button>
         </div>
@@ -409,13 +409,13 @@ export default function NewInvoiceForm({
       </div>
 
       <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="button" onClick={closeInvoice} disabled={!!submitting || depositTooBig} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+        <button type="button" className="btn btn-primary" onClick={closeInvoice} disabled={!!submitting || depositTooBig}>
           {submitting === "close" ? "Saving..." : "Close Invoice"}
         </button>
-        <button type="button" onClick={saveDraft} disabled={!!submitting} style={{ padding: "0.7rem 1.4rem", cursor: "pointer" }}>
+        <button type="button" className="btn" onClick={saveDraft} disabled={!!submitting}>
           {submitting === "draft" ? "Saving..." : "Save as Draft"}
         </button>
-        <Link href="/invoices" style={{ padding: "0.7rem 1.4rem", alignSelf: "center" }}>
+        <Link href="/invoices" className="btn">
           Cancel
         </Link>
       </div>

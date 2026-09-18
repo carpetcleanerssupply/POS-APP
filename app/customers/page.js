@@ -43,9 +43,9 @@ export default async function CustomersPage({ searchParams }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
         <h1>Customers</h1>
         <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/api/customers/export">Export CSV</Link>
-          <Link href="/api/customers/mailing-list">Export Mailing List</Link>
-          <Link href="/customers/import">Import CSV</Link>
+          <Link href="/api/customers/export" className="btn btn-sm">Export CSV</Link>
+          <Link href="/api/customers/mailing-list" className="btn btn-sm">Export Mailing List</Link>
+          <Link href="/customers/import" className="btn btn-sm">Import CSV</Link>
           <Link href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
             + Add Customer
           </Link>
@@ -66,7 +66,7 @@ export default async function CustomersPage({ searchParams }) {
           placeholder="Search name, company, phone, email..."
           style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
         />
-        <button type="submit" style={{ padding: "0.5rem 0.9rem", cursor: "pointer" }}>Search</button>
+        <button type="submit" className="btn btn-sm">Search</button>
         {dueOnly && <input type="hidden" name="due" value="1" />}
         <Link
           href={dueOnly ? `/customers${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/customers?due=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}

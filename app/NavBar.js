@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/items", label: "Items" },
   { href: "/payments", label: "Payments Register" },
   { href: "/returns", label: "Returns" },
+  { href: "/reports/sales", label: "Sales Report", ownerOnly: true },
   { href: "/reports/ar-aging", label: "A/R Aging", ownerOnly: true },
   { href: "/reports/inventory-valuation", label: "Inventory Valuation", ownerOnly: true },
   { href: "/admin", label: "Admin", ownerOnly: true },

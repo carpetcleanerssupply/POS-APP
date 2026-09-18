@@ -104,9 +104,9 @@ export default function PaymentForm({ customer, openInvoices, creditAvailable, c
           </p>
           <button
             type="button"
+            className="btn btn-primary"
             disabled={busy || selectedIds.length === 0}
             onClick={() => submit("credit")}
-            style={{ padding: "0.5rem 1rem", cursor: "pointer" }}
           >
             Apply Credit to Selected Invoices
           </button>
@@ -118,7 +118,7 @@ export default function PaymentForm({ customer, openInvoices, creditAvailable, c
         {selectedIds.length > 0 && (
           <p style={{ color: "#777", fontSize: "0.85rem" }}>
             Selected invoices total {currency(selectedTotal)}.{" "}
-            <button type="button" onClick={() => setAmount(selectedTotal.toFixed(2))} style={{ cursor: "pointer" }}>
+            <button type="button" className="btn btn-sm" onClick={() => setAmount(selectedTotal.toFixed(2))}>
               Use this amount
             </button>
           </p>
@@ -158,7 +158,7 @@ export default function PaymentForm({ customer, openInvoices, creditAvailable, c
           If no invoices are checked above, the payment is applied to all open invoices, oldest first, and any
           leftover becomes credit on the account.
         </p>
-        <button type="button" disabled={busy} onClick={() => submit("payment")} style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
+        <button type="button" className="btn btn-primary" disabled={busy} onClick={() => submit("payment")}>
           {busy ? "Saving..." : "Record Payment"}
         </button>
       </div>

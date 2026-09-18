@@ -60,3 +60,52 @@ a {
     background: #fff;
   }
 }
+
+/* Buttons & button-style links */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d6d0c4;
+  background: #fff;
+  color: var(--brand-navy);
+  font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover {
+  background: #f0ece0;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--brand-navy);
+  color: #fff;
+  border-color: var(--brand-navy);
+}
+.btn-primary:hover {
+  background: var(--brand-navy-dark);
+}
+
+.btn-danger {
+  color: #c62828;
+  border-color: #eecaca;
+}
+.btn-danger:hover {
+  background: #ffebee;
+}
+
+.btn-sm {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}

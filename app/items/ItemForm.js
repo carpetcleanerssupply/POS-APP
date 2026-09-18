@@ -16,7 +16,7 @@ function currency(n) {
   return `$${Number(n || 0).toFixed(2)}`;
 }
 
-export default function ItemForm({ action, item, error, submitLabel }) {
+export default function ItemForm({ action, item, error, submitLabel, showMargin }) {
   const v = (key, fallback = "") => item?.[key] ?? fallback;
 
   const [cost, setCost] = useState(v("cost", 0));
@@ -92,10 +92,12 @@ export default function ItemForm({ action, item, error, submitLabel }) {
           </label>
         </div>
 
-        <div style={{ fontSize: "0.85rem", color: profit >= 0 ? "#2e7d32" : "#c62828" }}>
-          Profit: {currency(profit)}
-          {margin != null && <span style={{ color: "#777" }}> ({margin.toFixed(1)}% margin)</span>}
-        </div>
+        {showMargin && (
+          <div style={{ fontSize: "0.85rem", color: profit >= 0 ? "#2e7d32" : "#c62828" }}>
+            Profit: {currency(profit)}
+            {margin != null && <span style={{ color: "#777" }}> ({margin.toFixed(1)}% margin)</span>}
+          </div>
+        )}
 
         <div style={rowStyle}>
           <label style={labelStyle}>
@@ -139,10 +141,10 @@ export default function ItemForm({ action, item, error, submitLabel }) {
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          <button type="submit" style={{ padding: "0.6rem 1.2rem", cursor: "pointer" }}>
+          <button type="submit" className="btn btn-primary">
             {submitLabel}
           </button>
-          <Link href="/items" style={{ padding: "0.6rem 1.2rem", alignSelf: "center" }}>
+          <Link href="/items" className="btn">
             Cancel
           </Link>
         </div>

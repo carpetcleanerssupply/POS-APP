@@ -6,6 +6,7 @@ import { formatAddress } from "@/lib/customers";
 import { paymentMethodLabel } from "@/lib/payments";
 import { buildMailtoUrl } from "@/lib/mailto";
 import { COMPANY } from "@/lib/company";
+import DocumentLetterhead from "../../DocumentLetterhead";
 import DeleteDraftButton from "../DeleteDraftButton";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
@@ -61,6 +62,8 @@ export default async function InvoiceDetailPage({ params }) {
   return (
     <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
       <p className="no-print"><Link href="/invoices">&larr; Back to Invoices</Link></p>
+
+      <DocumentLetterhead />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h1>Invoice #{invoice.number}</h1>

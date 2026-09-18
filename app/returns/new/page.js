@@ -23,7 +23,7 @@ export default async function NewReturnPage({ searchParams }) {
         <h1>Process a Return</h1>
         <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
           <input name="number" type="number" placeholder="Invoice #" style={{ padding: "0.5rem", flex: 1 }} />
-          <button type="submit" style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>Find</button>
+          <button type="submit" className="btn btn-sm">Find</button>
         </form>
         {params?.number && <p style={{ color: "#c62828" }}>No invoice #{params.number} found.</p>}
       </main>

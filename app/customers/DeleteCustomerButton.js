@@ -11,7 +11,7 @@ export default function DeleteCustomerButton({ customerId, customerName }) {
         }
       }}
     >
-      <button type="submit" style={{ color: "#c62828", cursor: "pointer", background: "none", border: "none", padding: 0 }}>
+      <button type="submit" className="btn btn-sm btn-danger">
         Delete
       </button>
     </form>
