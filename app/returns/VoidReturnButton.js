@@ -23,7 +23,8 @@ export default function VoidReturnButton({ returnId }) {
         }
         router.refresh();
       }}
-      className="btn btn-sm btn-danger"
+      className="text-xs font-semibold"
+      style={{ color: "var(--rust)", cursor: "pointer" }}
     >
       {busy ? "Voiding..." : "Void"}
     </button>
