@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TAX_RATE, lineExt } from "@/lib/invoices";
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
-const rowStyle = { display: "flex", gap: "1rem" };
-const labelStyle = { flex: 1, fontSize: "0.9rem" };
+const inputClass = "px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
 
 function currency(n) {
   return `$${Number(n).toFixed(2)}`;
@@ -92,15 +91,15 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form onSubmit={handleSubmit} className="card p-5 flex flex-col gap-4" style={{ maxWidth: 800 }}>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
 
-      <p>Customer: <strong>{customer.name}</strong></p>
+      <p className="text-sm">Customer: <strong>{customer.name}</strong></p>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+      <div className="rounded-lg p-4" style={{ backgroundColor: "var(--paper)", border: "1px solid var(--line)" }}>
+        <div className="flex gap-2 mb-3">
           <input
             value={pickerSku}
             onChange={(e) => setPickerSku(e.target.value)}
@@ -112,57 +111,58 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
             }}
             list="item-options"
             placeholder="Enter SKU or item name, then Add"
-            style={{ ...fieldStyle, marginTop: 0, flex: 1 }}
+            className={inputClass}
+            style={{ ...inputStyle, flex: 1 }}
           />
           <datalist id="item-options">
             {items.map((i) => (
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" className="btn btn-sm" onClick={addLine}>
-            Add
-          </button>
+          <button type="button" onClick={addLine} className="btn btn-sm">Add</button>
         </div>
 
         {lineRows.length === 0 ? (
-          <p style={{ color: "#777" }}>No line items yet.</p>
+          <p className="text-sm" style={{ color: "var(--faint)" }}>No line items yet.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="w-full text-sm">
             <thead>
-              <tr style={{ fontSize: "0.8rem", textAlign: "left" }}>
-                <th>Item</th>
-                <th style={{ width: 70 }}>Qty</th>
-                <th style={{ width: 80 }}>Disc %</th>
-                <th style={{ width: 90, textAlign: "right" }}>Ext</th>
-                <th style={{ width: 30 }}></th>
+              <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+                <th className="pb-2 font-medium">Item</th>
+                <th className="pb-2 font-medium" style={{ width: 70 }}>Qty</th>
+                <th className="pb-2 font-medium" style={{ width: 80 }}>Disc %</th>
+                <th className="pb-2 font-medium text-right" style={{ width: 90 }}>Ext</th>
+                <th className="pb-2" style={{ width: 30 }}></th>
               </tr>
             </thead>
             <tbody>
               {lineRows.map((r) => (
-                <tr key={r.itemId}>
-                  <td>{r.item ? `${r.item.name} (${r.item.sku})` : "Unknown item"}</td>
-                  <td>
+                <tr key={r.itemId} className="border-t hairline">
+                  <td className="py-1.5">{r.item ? `${r.item.name} (${r.item.sku})` : "Unknown item"}</td>
+                  <td className="py-1.5">
                     <input
                       type="number"
                       min="1"
                       value={r.qty}
                       onChange={(e) => updateLine(r.itemId, { qty: e.target.value })}
-                      style={{ width: 60, padding: "0.3rem" }}
+                      className="rounded border hairline focus-amber"
+                      style={{ ...inputStyle, width: 60, padding: "0.3rem" }}
                     />
                   </td>
-                  <td>
+                  <td className="py-1.5">
                     <input
                       type="number"
                       min="0"
                       max="100"
                       value={r.discountPct}
                       onChange={(e) => updateLine(r.itemId, { discountPct: e.target.value })}
-                      style={{ width: 70, padding: "0.3rem" }}
+                      className="rounded border hairline focus-amber"
+                      style={{ ...inputStyle, width: 70, padding: "0.3rem" }}
                     />
                   </td>
-                  <td style={{ textAlign: "right" }}>{currency(r.ext)}</td>
-                  <td>
-                    <button type="button" onClick={() => removeLine(r.itemId)} style={{ color: "#c62828", cursor: "pointer" }}>
+                  <td className="py-1.5 text-right mono">{currency(r.ext)}</td>
+                  <td className="py-1.5">
+                    <button type="button" onClick={() => removeLine(r.itemId)} style={{ color: "var(--rust)", cursor: "pointer" }}>
                       ✕
                     </button>
                   </td>
@@ -173,35 +173,33 @@ export default function EstimateForm({ items, customer, estimateId, initialLines
         )}
       </div>
 
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Expiration Date
-          <input type="date" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} style={fieldStyle} />
-        </label>
-        <label style={labelStyle}>
-          Shipping Charge
-          <input type="number" min="0" step="0.01" value={shippingCharge} onChange={(e) => setShippingCharge(e.target.value)} style={fieldStyle} />
-        </label>
+      <div className="flex gap-4 flex-wrap">
+        <div className="flex-1" style={{ minWidth: 200 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Expiration Date</div>
+          <input type="date" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+        </div>
+        <div className="flex-1" style={{ minWidth: 200 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Shipping Charge</div>
+          <input type="number" min="0" step="0.01" value={shippingCharge} onChange={(e) => setShippingCharge(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+        </div>
       </div>
 
-      <label>
-        Notes
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} style={{ ...fieldStyle, minHeight: 60 }} />
-      </label>
-
-      <div style={{ textAlign: "right", fontSize: "0.95rem" }}>
-        <div>Subtotal: {currency(subtotal)}</div>
-        {TAX_RATE > 0 && <div>Tax: {currency(tax)}</div>}
-        <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: {currency(total)}</div>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Notes</div>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%", minHeight: 60 }} />
       </div>
 
-      <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+      <div className="text-right text-sm">
+        <div style={{ color: "var(--faint)" }}>Subtotal: {currency(subtotal)}</div>
+        {TAX_RATE > 0 && <div style={{ color: "var(--faint)" }}>Tax: {currency(tax)}</div>}
+        <div className="font-semibold text-lg mono mt-1" style={{ color: "var(--deep)" }}>Total: {currency(total)}</div>
+      </div>
+
+      <div className="flex gap-3">
+        <button type="submit" disabled={submitting} className="btn btn-primary">
           {submitting ? "Saving..." : "Save Estimate"}
         </button>
-        <Link href="/estimates" className="btn">
-          Cancel
-        </Link>
+        <Link href="/estimates" className="btn">Cancel</Link>
       </div>
     </form>
   );

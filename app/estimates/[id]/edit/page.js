@@ -15,8 +15,11 @@ export default async function EditEstimatePage({ params }) {
 
   if (estimate.status !== "OPEN") {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>This estimate has been converted and can no longer be edited. <Link href={`/estimates/${id}`}>View it</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
+          This estimate has been converted and can no longer be edited.{" "}
+          <Link href={`/estimates/${id}`} className="underline" style={{ color: "var(--deep)" }}>View it</Link>.
+        </p>
       </main>
     );
   }
@@ -27,9 +30,14 @@ export default async function EditEstimatePage({ params }) {
   const initialLines = estimate.lines.map((l) => ({ itemId: l.itemId, qty: l.qty, discountPct: Number(l.discountPct), note: l.note || "" }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><Link href={`/estimates/${id}`}>&larr; Back to Estimate #{estimate.number}</Link></p>
-      <h1>Edit Estimate #{estimate.number}</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href={`/estimates/${id}`} className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Estimate #{estimate.number}</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Estimates</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Edit Estimate #{estimate.number}</h1>
+      </div>
       <EstimateForm
         items={plainItems}
         customer={{ id: estimate.customer.id, name: estimate.customerName, taxExempt: estimate.customer.taxExempt }}

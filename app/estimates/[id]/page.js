@@ -8,9 +8,6 @@ import DocumentLetterhead from "../../DocumentLetterhead";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
 
-const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
-const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-
 export default async function EstimateDetailPage({ params }) {
   await requireSession();
   const { id } = await params;
@@ -51,83 +48,90 @@ export default async function EstimateDetailPage({ params }) {
   });
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><Link href="/estimates">&larr; Back to Estimates</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="no-print mb-3">
+        <Link href="/estimates" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Estimates</Link>
+      </p>
 
       <DocumentLetterhead />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h1>Estimate #{estimate.number}</h1>
+      <div className="flex justify-between items-baseline mt-4">
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Estimate #{estimate.number}</h1>
         <span
+          className="px-3 py-1 rounded-md font-semibold text-xs"
           style={{
-            padding: "0.3rem 0.7rem",
-            borderRadius: 6,
-            background: isConverted ? "#e8f5e9" : "#fff3e0",
-            color: isConverted ? "#2e7d32" : "#e65100",
-            fontWeight: 600,
-            fontSize: "0.85rem",
+            backgroundColor: isConverted ? "var(--moss-bg)" : "#FBF0DA",
+            color: isConverted ? "var(--moss)" : "var(--amber-dark)",
           }}
         >
           {isConverted ? "Converted" : "Open"}
         </span>
       </div>
 
-      <p style={{ color: "#555" }}>
+      <p className="text-sm mt-1" style={{ color: "var(--faint)" }}>
         {new Date(estimate.date).toLocaleDateString()}
         {estimate.expirationDate && ` · Valid until ${new Date(estimate.expirationDate).toLocaleDateString()}`}
       </p>
 
-      <h3>{estimate.customerName}</h3>
+      <h3 className="text-base font-semibold mt-3" style={{ color: "var(--ink)" }}>{estimate.customerName}</h3>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
-        <thead>
-          <tr>
-            <th style={th}>SKU</th>
-            <th style={th}>Item</th>
-            <th style={th}>Qty</th>
-            <th style={th}>Price</th>
-            <th style={th}>Disc</th>
-            <th style={{ ...th, textAlign: "right" }}>Ext</th>
-          </tr>
-        </thead>
-        <tbody>
-          {estimate.lines.map((l) => (
-            <tr key={l.id}>
-              <td style={td}>{l.sku}</td>
-              <td style={td}>{l.name}</td>
-              <td style={td}>{l.qty}</td>
-              <td style={td}>${Number(l.price).toFixed(2)}</td>
-              <td style={td}>{Number(l.discountPct) > 0 ? `${l.discountPct}%` : "—"}</td>
-              <td style={{ ...td, textAlign: "right" }}>${Number(l.ext).toFixed(2)}</td>
+      <div className="card overflow-hidden mt-4">
+        <table className="w-full text-sm">
+          <thead>
+            <tr style={{ backgroundColor: "var(--paper)" }}>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>SKU</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Item</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Qty</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Price</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Disc</th>
+              <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Ext</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {estimate.lines.map((l) => (
+              <tr key={l.id}>
+                <td className="px-3 py-2 border-t hairline mono" style={{ color: "var(--faint)" }}>{l.sku}</td>
+                <td className="px-3 py-2 border-t hairline">{l.name}</td>
+                <td className="px-3 py-2 border-t hairline">{l.qty}</td>
+                <td className="px-3 py-2 border-t hairline mono">${Number(l.price).toFixed(2)}</td>
+                <td className="px-3 py-2 border-t hairline">{Number(l.discountPct) > 0 ? `${l.discountPct}%` : "—"}</td>
+                <td className="px-3 py-2 border-t hairline text-right mono font-medium">${Number(l.ext).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div style={{ textAlign: "right", marginTop: "1rem" }}>
-        <div>Subtotal: ${Number(estimate.subtotal).toFixed(2)}</div>
-        {Number(estimate.shippingCharge) > 0 && <div>Shipping: ${Number(estimate.shippingCharge).toFixed(2)}</div>}
-        {Number(estimate.tax) > 0 && <div>Tax: ${Number(estimate.tax).toFixed(2)}</div>}
-        <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: ${Number(estimate.total).toFixed(2)}</div>
+      <div className="text-right mt-3 text-sm">
+        <div style={{ color: "var(--faint)" }}>Subtotal: ${Number(estimate.subtotal).toFixed(2)}</div>
+        {Number(estimate.shippingCharge) > 0 && <div style={{ color: "var(--faint)" }}>Shipping: ${Number(estimate.shippingCharge).toFixed(2)}</div>}
+        {Number(estimate.tax) > 0 && <div style={{ color: "var(--faint)" }}>Tax: ${Number(estimate.tax).toFixed(2)}</div>}
+        <div className="font-semibold text-lg mono mt-1" style={{ color: "var(--deep)" }}>Total: ${Number(estimate.total).toFixed(2)}</div>
       </div>
 
       {estimate.notes && (
-        <p style={{ marginTop: "1rem" }}>
+        <p className="text-sm mt-4">
           <strong>Notes:</strong> {estimate.notes}
         </p>
       )}
 
-      <p className="no-print" style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+      <p className="no-print flex gap-4 mt-5 items-center flex-wrap">
         <PrintButton />
         <EmailButton mailtoUrl={emailMailto} />
         {isConverted ? (
           estimate.convertedInvoice && (
-            <Link href={`/invoices/${estimate.convertedInvoice.id}`}>View Invoice #{estimate.convertedInvoice.number}</Link>
+            <Link href={`/invoices/${estimate.convertedInvoice.id}`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+              View Invoice #{estimate.convertedInvoice.number}
+            </Link>
           )
         ) : (
           <>
-            <Link href={`/invoices/new?estimateId=${estimate.id}`}>Convert to Invoice</Link>
-            <Link href={`/estimates/${estimate.id}/edit`}>Edit</Link>
+            <Link href={`/invoices/new?estimateId=${estimate.id}`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+              Convert to Invoice
+            </Link>
+            <Link href={`/estimates/${estimate.id}/edit`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+              Edit
+            </Link>
           </>
         )}
       </p>
