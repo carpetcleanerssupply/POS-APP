@@ -11,9 +11,6 @@ import PODetailActions from "../PODetailActions";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
 
-const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
-const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-
 const STATUS_LABEL = { DRAFT: "Draft", ORDERED: "Ordered", PARTIAL: "Partially Received", RECEIVED: "Received" };
 
 export const dynamic = "force-dynamic";
@@ -47,58 +44,62 @@ export default async function PurchaseOrderDetailPage({ params }) {
   });
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><Link href="/purchase-orders">&larr; Back to Purchase Orders</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="no-print mb-3">
+        <Link href="/purchase-orders" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Purchase Orders</Link>
+      </p>
 
       <DocumentLetterhead />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h1>PO #{po.number}</h1>
-        <span style={{ padding: "0.3rem 0.7rem", borderRadius: 6, background: "#eee", fontWeight: 600, fontSize: "0.85rem" }}>
+      <div className="flex justify-between items-baseline mt-4">
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>PO #{po.number}</h1>
+        <span className="px-3 py-1 rounded-md font-semibold text-xs" style={{ backgroundColor: "var(--paper)", color: "var(--ink)" }}>
           {STATUS_LABEL[po.status]}{po.paid ? ` · Paid${po.checkNumber ? ` (check #${po.checkNumber})` : ""}` : ""}
         </span>
       </div>
 
-      <p style={{ color: "#555" }}>{po.vendorName} &middot; {new Date(po.date).toLocaleDateString()}</p>
+      <p className="text-sm mt-1" style={{ color: "var(--faint)" }}>{po.vendorName} &middot; {new Date(po.date).toLocaleDateString()}</p>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
-        <thead>
-          <tr>
-            <th style={th}>SKU</th>
-            <th style={th}>Item</th>
-            <th style={th}>Ordered</th>
-            <th style={th}>= Pieces</th>
-            <th style={th}>Received</th>
-            <th style={th}>Cost</th>
-            <th style={{ ...th, textAlign: "right" }}>Ext</th>
-          </tr>
-        </thead>
-        <tbody>
-          {plainLines.map((l) => (
-            <tr key={l.id}>
-              <td style={td}>{l.sku}</td>
-              <td style={td}>{l.name}</td>
-              <td style={td}>{l.qtyOrdered}</td>
-              <td style={td}>{l.qtyOrdered * (l.caseQty || 1)}</td>
-              <td style={td}>{l.qtyReceived}</td>
-              <td style={td}>${l.cost.toFixed(2)}</td>
-              <td style={{ ...td, textAlign: "right" }}>${(l.qtyOrdered * l.cost).toFixed(2)}</td>
+      <div className="card overflow-hidden mt-4">
+        <table className="w-full text-sm">
+          <thead>
+            <tr style={{ backgroundColor: "var(--paper)" }}>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>SKU</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Item</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Ordered</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>= Pieces</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Received</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Cost</th>
+              <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Ext</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {plainLines.map((l) => (
+              <tr key={l.id}>
+                <td className="px-3 py-2 border-t hairline mono" style={{ color: "var(--faint)" }}>{l.sku}</td>
+                <td className="px-3 py-2 border-t hairline">{l.name}</td>
+                <td className="px-3 py-2 border-t hairline">{l.qtyOrdered}</td>
+                <td className="px-3 py-2 border-t hairline">{l.qtyOrdered * (l.caseQty || 1)}</td>
+                <td className="px-3 py-2 border-t hairline">{l.qtyReceived}</td>
+                <td className="px-3 py-2 border-t hairline mono">${l.cost.toFixed(2)}</td>
+                <td className="px-3 py-2 border-t hairline text-right mono font-medium">${(l.qtyOrdered * l.cost).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div style={{ textAlign: "right", marginTop: "1rem", fontWeight: 700, fontSize: "1.1rem" }}>
+      <div className="text-right mt-3 font-semibold text-lg mono" style={{ color: "var(--deep)" }}>
         PO Total: ${total.toFixed(2)}
       </div>
 
       {po.notes && (
-        <p style={{ marginTop: "1rem" }}>
+        <p className="text-sm mt-4">
           <strong>Notes:</strong> {po.notes}
         </p>
       )}
 
-      <p className="no-print" style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+      <p className="no-print flex gap-3 mt-4">
         <PrintButton />
         <EmailButton mailtoUrl={emailMailto} />
       </p>

@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
 
 function currency(n) {
   return `$${Number(n).toFixed(2)}`;
@@ -85,23 +86,23 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form onSubmit={handleSubmit} className="card p-5 flex flex-col gap-4" style={{ maxWidth: 800 }}>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
 
-      <label>
-        Vendor *
-        <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} style={fieldStyle}>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Vendor *</div>
+        <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className={inputClass} style={inputStyle}>
           <option value="">Select a vendor...</option>
           {vendors.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </select>
-      </label>
+      </div>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+      <div className="rounded-lg p-4" style={{ backgroundColor: "var(--paper)", border: "1px solid var(--line)" }}>
+        <div className="flex gap-2 mb-3">
           <input
             value={pickerSku}
             onChange={(e) => setPickerSku(e.target.value)}
@@ -113,50 +114,49 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
             }}
             list="item-options"
             placeholder="Enter SKU or item name, then Add"
-            style={{ ...fieldStyle, marginTop: 0, flex: 1 }}
+            className={inputClass}
+            style={{ ...inputStyle, flex: 1 }}
           />
           <datalist id="item-options">
             {items.map((i) => (
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" className="btn btn-sm" onClick={addLine}>
-            Add
-          </button>
+          <button type="button" onClick={addLine} className="btn btn-sm">Add</button>
         </div>
 
         {lines.length === 0 ? (
-          <p style={{ color: "#777" }}>No line items yet.</p>
+          <p className="text-sm" style={{ color: "var(--faint)" }}>No line items yet.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="w-full text-sm">
             <thead>
-              <tr style={{ fontSize: "0.8rem", textAlign: "left" }}>
-                <th>Item</th>
-                <th style={{ width: 80 }}>Qty</th>
-                <th style={{ width: 90 }}>Cost</th>
-                <th style={{ width: 80 }}>Case Qty</th>
-                <th style={{ width: 90, textAlign: "right" }}>Ext</th>
-                <th style={{ width: 30 }}></th>
+              <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+                <th className="pb-2 font-medium">Item</th>
+                <th className="pb-2 font-medium" style={{ width: 80 }}>Qty</th>
+                <th className="pb-2 font-medium" style={{ width: 90 }}>Cost</th>
+                <th className="pb-2 font-medium" style={{ width: 80 }}>Case Qty</th>
+                <th className="pb-2 font-medium text-right" style={{ width: 90 }}>Ext</th>
+                <th className="pb-2" style={{ width: 30 }}></th>
               </tr>
             </thead>
             <tbody>
               {lines.map((l) => {
                 const item = itemsById[l.itemId];
                 return (
-                  <tr key={l.itemId}>
-                    <td>{item ? `${item.name} (${item.sku})` : "Unknown item"}</td>
-                    <td>
-                      <input type="number" min="1" value={l.qtyOrdered} onChange={(e) => updateLine(l.itemId, { qtyOrdered: e.target.value })} style={{ width: 60, padding: "0.3rem" }} />
+                  <tr key={l.itemId} className="border-t hairline">
+                    <td className="py-1.5">{item ? `${item.name} (${item.sku})` : "Unknown item"}</td>
+                    <td className="py-1.5">
+                      <input type="number" min="1" value={l.qtyOrdered} onChange={(e) => updateLine(l.itemId, { qtyOrdered: e.target.value })} className="rounded border hairline focus-amber" style={{ ...inputStyle, width: 60, padding: "0.3rem" }} />
                     </td>
-                    <td>
-                      <input type="number" min="0" step="0.01" value={l.cost} onChange={(e) => updateLine(l.itemId, { cost: e.target.value })} style={{ width: 80, padding: "0.3rem" }} />
+                    <td className="py-1.5">
+                      <input type="number" min="0" step="0.01" value={l.cost} onChange={(e) => updateLine(l.itemId, { cost: e.target.value })} className="rounded border hairline focus-amber" style={{ ...inputStyle, width: 80, padding: "0.3rem" }} />
                     </td>
-                    <td>
-                      <input type="number" min="1" value={l.caseQty} onChange={(e) => updateLine(l.itemId, { caseQty: e.target.value })} style={{ width: 60, padding: "0.3rem" }} />
+                    <td className="py-1.5">
+                      <input type="number" min="1" value={l.caseQty} onChange={(e) => updateLine(l.itemId, { caseQty: e.target.value })} className="rounded border hairline focus-amber" style={{ ...inputStyle, width: 60, padding: "0.3rem" }} />
                     </td>
-                    <td style={{ textAlign: "right" }}>{currency((Number(l.qtyOrdered) || 0) * (Number(l.cost) || 0))}</td>
-                    <td>
-                      <button type="button" onClick={() => removeLine(l.itemId)} style={{ color: "#c62828", cursor: "pointer" }}>✕</button>
+                    <td className="py-1.5 text-right mono">{currency((Number(l.qtyOrdered) || 0) * (Number(l.cost) || 0))}</td>
+                    <td className="py-1.5">
+                      <button type="button" onClick={() => removeLine(l.itemId)} style={{ color: "var(--rust)", cursor: "pointer" }}>✕</button>
                     </td>
                   </tr>
                 );
@@ -166,15 +166,15 @@ export default function POForm({ items, vendors, poId, initialVendorId = "", ini
         )}
       </div>
 
-      <label>
-        Notes
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} style={{ ...fieldStyle, minHeight: 60 }} />
-      </label>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Notes</div>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={inputClass} style={{ ...inputStyle, minHeight: 60 }} />
+      </div>
 
-      <div style={{ fontWeight: 700, fontSize: "1.1rem", textAlign: "right" }}>PO Total: {currency(total)}</div>
+      <div className="text-right font-semibold text-lg mono" style={{ color: "var(--deep)" }}>PO Total: {currency(total)}</div>
 
-      <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="submit" className="btn btn-primary" disabled={submitting}>
+      <div className="flex gap-3">
+        <button type="submit" disabled={submitting} className="btn btn-primary">
           {submitting ? "Saving..." : poId ? "Save Changes" : "Create Draft PO"}
         </button>
         <Link href="/purchase-orders" className="btn">Cancel</Link>

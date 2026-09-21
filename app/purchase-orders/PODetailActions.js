@@ -43,23 +43,24 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
   return (
     <div>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
 
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "1rem 0" }}>
+      <div className="flex gap-3 flex-wrap items-center my-4">
         {po.status === "DRAFT" && (
           <>
             <Link href={`/purchase-orders/${po.id}/edit`} className="btn btn-sm">Edit</Link>
-            <button type="button" className="btn btn-sm" disabled={busy} onClick={() => call(`/api/purchase-orders/${po.id}/mark-ordered`)}>
+            <button type="button" disabled={busy} onClick={() => call(`/api/purchase-orders/${po.id}/mark-ordered`)} className="btn btn-sm">
               Mark Ordered
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-danger"
               disabled={busy}
               onClick={() => {
                 if (confirm("Delete this draft PO?")) call(`/api/purchase-orders/${po.id}/delete`).then((ok) => ok && router.push("/purchase-orders"));
               }}
+              className="text-sm font-semibold"
+              style={{ color: "var(--rust)", cursor: "pointer" }}
             >
               Delete
             </button>
@@ -69,7 +70,7 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
 
         {!po.paid && (
           <>
-            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)} style={{ padding: "0.5rem" }}>
+            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)} className="px-3 py-2 rounded border text-sm hairline" style={{ backgroundColor: "var(--panel)" }}>
               <option value="CARD">Card</option>
               <option value="CHECK">Check</option>
               <option value="CASH">Cash</option>
@@ -79,17 +80,18 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
                 placeholder="Check #"
                 value={payCheckNumber}
                 onChange={(e) => setPayCheckNumber(e.target.value)}
-                style={{ padding: "0.3rem", width: 100 }}
+                className="rounded border hairline focus-amber text-sm"
+                style={{ backgroundColor: "var(--panel)", padding: "0.45rem", width: 100 }}
               />
             )}
           </>
         )}
         <button
           type="button"
-          className="btn btn-sm"
           disabled={busy || (po.paid && !canUnmarkPaid)}
           title={po.paid && !canUnmarkPaid ? "Unmarking as paid requires an Owner/Manager login" : undefined}
           onClick={() => call(`/api/purchase-orders/${po.id}/toggle-paid`, { method: payMethod, checkNumber: payCheckNumber })}
+          className="btn btn-sm btn-primary"
           style={{ cursor: po.paid && !canUnmarkPaid ? "not-allowed" : "pointer" }}
         >
           {po.paid ? "Unmark as Paid" : "Mark as Paid"}
@@ -97,15 +99,15 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
       </div>
 
       {canReceive && receivableLines.length > 0 && (
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem", marginTop: "1rem" }}>
-          <h3 style={{ marginTop: 0 }}>Receive Shipment</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="card p-4 mt-4">
+          <div className="text-sm font-semibold mb-3" style={{ color: "var(--deep)" }}>Receive Shipment</div>
+          <table className="w-full text-sm">
             <thead>
-              <tr style={{ fontSize: "0.8rem", textAlign: "left" }}>
-                <th>Item</th>
-                <th>Ordered</th>
-                <th>Received</th>
-                <th style={{ width: 100 }}>Receive Now</th>
+              <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+                <th className="pb-2 font-medium">Item</th>
+                <th className="pb-2 font-medium">Ordered</th>
+                <th className="pb-2 font-medium">Received</th>
+                <th className="pb-2 font-medium" style={{ width: 100 }}>Receive Now</th>
               </tr>
             </thead>
             <tbody>
@@ -113,21 +115,22 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
                 const caseQty = l.caseQty || 1;
                 const receiveNow = Number(receiveQtys[l.id]) || 0;
                 return (
-                  <tr key={l.id}>
-                    <td>{l.name} ({l.sku})</td>
-                    <td>{l.qtyOrdered}</td>
-                    <td>{l.qtyReceived}</td>
-                    <td>
+                  <tr key={l.id} className="border-t hairline">
+                    <td className="py-1.5">{l.name} ({l.sku})</td>
+                    <td className="py-1.5">{l.qtyOrdered}</td>
+                    <td className="py-1.5">{l.qtyReceived}</td>
+                    <td className="py-1.5">
                       <input
                         type="number"
                         min="0"
                         max={l.qtyOrdered - l.qtyReceived}
                         value={receiveQtys[l.id] || ""}
                         onChange={(e) => setReceiveQtys((prev) => ({ ...prev, [l.id]: e.target.value }))}
-                        style={{ width: 70, padding: "0.3rem" }}
+                        className="rounded border hairline focus-amber"
+                        style={{ backgroundColor: "var(--panel)", width: 70, padding: "0.3rem" }}
                       />
                       {caseQty > 1 && receiveNow > 0 && (
-                        <div style={{ fontSize: "0.75rem", color: "#777", marginTop: "0.2rem" }}>= {receiveNow * caseQty} pcs</div>
+                        <div className="text-xs mt-1" style={{ color: "var(--faint)" }}>= {receiveNow * caseQty} pcs</div>
                       )}
                     </td>
                   </tr>
@@ -137,14 +140,13 @@ export default function PODetailActions({ po, lines, canUnmarkPaid }) {
           </table>
           <button
             type="button"
-            className="btn btn-primary"
             disabled={busy}
             onClick={() =>
               call(`/api/purchase-orders/${po.id}/receive`, {
                 receipts: Object.entries(receiveQtys).map(([lineId, qty]) => ({ lineId, qty })),
               }).then((ok) => ok && setReceiveQtys({}))
             }
-            style={{ marginTop: "0.75rem" }}
+            className="btn btn-primary mt-3"
           >
             Receive
           </button>

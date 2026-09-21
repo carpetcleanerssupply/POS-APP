@@ -16,8 +16,11 @@ export default async function EditPurchaseOrderPage({ params }) {
 
   if (!isPoEditable(po)) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>This PO can no longer be edited — receiving has already started. <Link href={`/purchase-orders/${id}`}>View it</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
+          This PO can no longer be edited — receiving has already started.{" "}
+          <Link href={`/purchase-orders/${id}`} className="underline" style={{ color: "var(--deep)" }}>View it</Link>.
+        </p>
       </main>
     );
   }
@@ -37,9 +40,14 @@ export default async function EditPurchaseOrderPage({ params }) {
   }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><Link href={`/purchase-orders/${id}`}>&larr; Back to PO #{po.number}</Link></p>
-      <h1>Edit PO #{po.number}</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href={`/purchase-orders/${id}`} className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to PO #{po.number}</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Purchasing</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Edit PO #{po.number}</h1>
+      </div>
       <POForm
         items={plainItems}
         vendors={vendors.map((v) => ({ id: v.id, name: v.name }))}
