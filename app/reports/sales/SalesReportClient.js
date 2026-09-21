@@ -3,9 +3,6 @@
 import { useMemo, useState } from "react";
 import Papa from "papaparse";
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
-
 function currency(n) {
   return `$${Number(n || 0).toFixed(2)}`;
 }
@@ -87,31 +84,33 @@ export default function SalesReportClient({ invoiceSummaries, lineRows }) {
   }
 
   if (byMonth.length === 0) {
-    return <p style={{ color: "#777" }}>No closed invoices yet — sales will show up here once some are on the books.</p>;
+    return <p className="text-sm" style={{ color: "var(--faint)" }}>No closed invoices yet — sales will show up here once some are on the books.</p>;
   }
+
+  const th = "px-3 py-2 text-left font-medium text-xs uppercase tracking-wide";
 
   return (
     <div>
-      <p className="no-print">
-        <button type="button" className="btn btn-sm" onClick={exportCsv}>Export CSV</button>
+      <p className="no-print mb-4">
+        <button type="button" onClick={exportCsv} className="btn btn-sm">Export CSV</button>
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1rem" }}>
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
-            <h3 style={{ margin: 0 }}>Revenue by Month (last 12)</h3>
+      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+        <div className="card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="eyebrow">Revenue by Month (last 12)</div>
             {selectedMonth && (
-              <button type="button" className="btn btn-sm" onClick={() => setSelectedMonth(null)}>
+              <button type="button" onClick={() => setSelectedMonth(null)} className="btn btn-sm">
                 Show all time →
               </button>
             )}
           </div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="w-full text-sm">
             <thead>
-              <tr>
-                <th style={th}>Month</th>
-                <th style={th}>Invoices</th>
-                <th style={{ ...th, textAlign: "right" }}>Revenue</th>
+              <tr style={{ backgroundColor: "var(--paper)" }}>
+                <th className={th} style={{ color: "var(--faint)" }}>Month</th>
+                <th className={th} style={{ color: "var(--faint)" }}>Invoices</th>
+                <th className={`${th} text-right`} style={{ color: "var(--faint)" }}>Revenue</th>
               </tr>
             </thead>
             <tbody>
@@ -119,19 +118,19 @@ export default function SalesReportClient({ invoiceSummaries, lineRows }) {
                 <tr
                   key={m.key}
                   onClick={() => setSelectedMonth(selectedMonth === m.key ? null : m.key)}
-                  style={{ cursor: "pointer", background: selectedMonth === m.key ? "#f7f2e8" : "transparent" }}
+                  style={{ cursor: "pointer", backgroundColor: selectedMonth === m.key ? "var(--paper)" : "transparent" }}
                 >
-                  <td style={td}>{m.label}</td>
-                  <td style={td}>{m.count}</td>
-                  <td style={{ ...td, textAlign: "right" }}>{currency(m.revenue)}</td>
+                  <td className="px-3 py-2 border-t hairline">{m.label}</td>
+                  <td className="px-3 py-2 border-t hairline">{m.count}</td>
+                  <td className="px-3 py-2 border-t hairline text-right mono">{currency(m.revenue)}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr>
-                <td style={{ ...td, fontWeight: 700, borderTop: "2px solid #1e3a5f", borderBottom: "none" }}>Total (12 mo.)</td>
-                <td style={{ ...td, borderTop: "2px solid #1e3a5f", borderBottom: "none" }}></td>
-                <td style={{ ...td, textAlign: "right", fontWeight: 700, borderTop: "2px solid #1e3a5f", borderBottom: "none" }}>
+                <td className="px-3 py-2 font-semibold" style={{ borderTop: "2px solid var(--deep)" }}>Total (12 mo.)</td>
+                <td className="px-3 py-2" style={{ borderTop: "2px solid var(--deep)" }}></td>
+                <td className="px-3 py-2 text-right font-semibold mono" style={{ borderTop: "2px solid var(--deep)" }}>
                   {currency(totalRevenue)}
                 </td>
               </tr>
@@ -139,57 +138,57 @@ export default function SalesReportClient({ invoiceSummaries, lineRows }) {
           </table>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-            <h3 style={{ marginTop: 0 }}>By Category — {selectedLabel}</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="flex flex-col gap-4">
+          <div className="card p-4">
+            <div className="eyebrow mb-3">By Category — {selectedLabel}</div>
+            <table className="w-full text-sm">
               <thead>
-                <tr>
-                  <th style={th}>Category</th>
-                  <th style={th}>Qty</th>
-                  <th style={{ ...th, textAlign: "right" }}>Revenue</th>
+                <tr style={{ backgroundColor: "var(--paper)" }}>
+                  <th className={th} style={{ color: "var(--faint)" }}>Category</th>
+                  <th className={th} style={{ color: "var(--faint)" }}>Qty</th>
+                  <th className={`${th} text-right`} style={{ color: "var(--faint)" }}>Revenue</th>
                 </tr>
               </thead>
               <tbody>
                 {categoryBreakdown.map((c) => (
                   <tr key={c.category}>
-                    <td style={td}>{c.category}</td>
-                    <td style={td}>{c.qty}</td>
-                    <td style={{ ...td, textAlign: "right" }}>{currency(c.revenue)}</td>
+                    <td className="px-3 py-2 border-t hairline">{c.category}</td>
+                    <td className="px-3 py-2 border-t hairline">{c.qty}</td>
+                    <td className="px-3 py-2 border-t hairline text-right mono">{currency(c.revenue)}</td>
                   </tr>
                 ))}
                 {categoryBreakdown.length === 0 && (
                   <tr>
-                    <td style={td} colSpan={3}>Nothing sold in this period.</td>
+                    <td className="px-3 py-4 text-sm border-t hairline" colSpan={3} style={{ color: "var(--faint)" }}>Nothing sold in this period.</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-            <h3 style={{ marginTop: 0 }}>Top Items — {selectedLabel}</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div className="card p-4">
+            <div className="eyebrow mb-3">Top Items — {selectedLabel}</div>
+            <table className="w-full text-sm">
               <thead>
-                <tr>
-                  <th style={th}>Item</th>
-                  <th style={th}>Qty</th>
-                  <th style={{ ...th, textAlign: "right" }}>Revenue</th>
+                <tr style={{ backgroundColor: "var(--paper)" }}>
+                  <th className={th} style={{ color: "var(--faint)" }}>Item</th>
+                  <th className={th} style={{ color: "var(--faint)" }}>Qty</th>
+                  <th className={`${th} text-right`} style={{ color: "var(--faint)" }}>Revenue</th>
                 </tr>
               </thead>
               <tbody>
                 {topItems.map((it, i) => (
                   <tr key={i}>
-                    <td style={td}>
-                      {it.name} <span style={{ color: "#777", fontSize: "0.8rem" }}>({it.sku})</span>
+                    <td className="px-3 py-2 border-t hairline">
+                      {it.name} <span className="text-xs" style={{ color: "var(--faint)" }}>({it.sku})</span>
                     </td>
-                    <td style={td}>{it.qty}</td>
-                    <td style={{ ...td, textAlign: "right" }}>{currency(it.revenue)}</td>
+                    <td className="px-3 py-2 border-t hairline">{it.qty}</td>
+                    <td className="px-3 py-2 border-t hairline text-right mono">{currency(it.revenue)}</td>
                   </tr>
                 ))}
                 {topItems.length === 0 && (
                   <tr>
-                    <td style={td} colSpan={3}>Nothing sold in this period.</td>
+                    <td className="px-3 py-4 text-sm border-t hairline" colSpan={3} style={{ color: "var(--faint)" }}>Nothing sold in this period.</td>
                   </tr>
                 )}
               </tbody>
