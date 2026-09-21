@@ -15,7 +15,7 @@ export async function POST(request, { params }) {
   const usage = await vendorUsage(prisma, vendor);
   if (usage.itemCount > 0 || usage.poCount > 0) {
     return NextResponse.redirect(
-      `${origin}/vendors?error=in_use&items=${usage.itemCount}&pos=${usage.poCount}`,
+      `${origin}/vendors?selected=${id}&error=in_use&items=${usage.itemCount}&pos=${usage.poCount}`,
       { status: 303 }
     );
   }

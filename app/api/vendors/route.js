@@ -14,8 +14,9 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/vendors/new?error=required`, { status: 303 });
   }
 
+  let vendor;
   try {
-    await prisma.vendor.create({ data });
+    vendor = await prisma.vendor.create({ data });
   } catch (error) {
     if (error.code === "P2002") {
       return NextResponse.redirect(`${origin}/vendors/new?error=duplicate_name`, { status: 303 });
@@ -23,5 +24,5 @@ export async function POST(request) {
     throw error;
   }
 
-  return NextResponse.redirect(`${origin}/vendors`, { status: 303 });
+  return NextResponse.redirect(`${origin}/vendors?selected=${vendor.id}`, { status: 303 });
 }

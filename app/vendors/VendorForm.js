@@ -1,94 +1,96 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { US_STATES } from "@/lib/us-states";
 
 const ERROR_MESSAGES = {
   required: "Enter a vendor name.",
   duplicate_name: "A vendor with that name already exists.",
 };
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
-const rowStyle = { display: "flex", gap: "1rem" };
-const labelStyle = { flex: 1, fontSize: "0.9rem" };
-const sectionStyle = { marginTop: "1.5rem", marginBottom: "0.5rem", fontSize: "1rem", fontWeight: 600 };
+function Field({ label, children }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>{label}</div>
+      {children}
+    </div>
+  );
+}
 
-export default function VendorForm({ action, vendor, error, submitLabel, balanceDue }) {
-  const v = (key, fallback = "") => vendor?.[key] ?? fallback;
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)", color: "var(--ink)" };
+
+const BLANK = { name: "", contactName: "", phone: "", email: "", email2: "", addressStreet: "", addressStreet2: "", addressCity: "", addressState: "", addressZip: "", notes: "" };
+
+export default function VendorForm({ action, error }) {
+  const [draft, setDraft] = useState(BLANK);
+  const set = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
 
   return (
-    <div style={{ maxWidth: 560 }}>
+    <div className="card p-5" style={{ maxWidth: 640 }}>
       {error && ERROR_MESSAGES[error] && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>
           {ERROR_MESSAGES[error]}
         </p>
       )}
 
-      {vendor && (
-        <p style={{ color: "#555" }}>
-          Balance Due: <strong>${Number(balanceDue || 0).toFixed(2)}</strong>
-        </p>
-      )}
-
-      <form action={action} method="POST" style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
-        <label>
-          Vendor Name *
-          <input name="name" defaultValue={v("name")} required style={fieldStyle} />
-        </label>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Contact Name
-            <input name="contactName" defaultValue={v("contactName")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Phone
-            <input name="phone" defaultValue={v("phone")} style={fieldStyle} />
-          </label>
-        </div>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Email
-            <input name="email" type="email" defaultValue={v("email")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Email 2
-            <input name="email2" type="email" defaultValue={v("email2")} style={fieldStyle} />
-          </label>
+      <form action={action} method="POST" className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Field label="Vendor Name">
+            <input name="name" value={draft.name} onChange={(e) => set("name", e.target.value)} required className={inputClass} style={inputStyle} />
+          </Field>
+          <Field label="Contact Name">
+            <input name="contactName" value={draft.contactName} onChange={(e) => set("contactName", e.target.value)} className={inputClass} style={inputStyle} />
+          </Field>
+          <Field label="Phone">
+            <input name="phone" value={draft.phone} onChange={(e) => set("phone", e.target.value)} className={inputClass} style={inputStyle} />
+          </Field>
+          <div />
+          <Field label="Email">
+            <input name="email" type="email" value={draft.email} onChange={(e) => set("email", e.target.value)} className={inputClass} style={inputStyle} />
+          </Field>
+          <Field label="Secondary Email">
+            <input name="email2" type="email" value={draft.email2} onChange={(e) => set("email2", e.target.value)} placeholder="optional" className={inputClass} style={inputStyle} />
+          </Field>
         </div>
 
-        <div style={sectionStyle}>Address</div>
-        <label>
-          Street
-          <input name="addressStreet" defaultValue={v("addressStreet")} style={fieldStyle} />
-        </label>
-        <label>
-          Street 2
-          <input name="addressStreet2" defaultValue={v("addressStreet2")} style={fieldStyle} />
-        </label>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            City
-            <input name="addressCity" defaultValue={v("addressCity")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            State
-            <input name="addressState" defaultValue={v("addressState")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            Zip
-            <input name="addressZip" defaultValue={v("addressZip")} style={fieldStyle} />
-          </label>
-        </div>
+        <Field label="Address">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="col-span-2">
+              <input name="addressStreet" value={draft.addressStreet} onChange={(e) => set("addressStreet", e.target.value)} placeholder="Street address" className={inputClass} style={inputStyle} />
+            </div>
+            <div className="col-span-2">
+              <input name="addressStreet2" value={draft.addressStreet2} onChange={(e) => set("addressStreet2", e.target.value)} placeholder="Apt, suite, unit (optional)" className={inputClass} style={inputStyle} />
+            </div>
+            <input name="addressCity" value={draft.addressCity} onChange={(e) => set("addressCity", e.target.value)} placeholder="City" className={inputClass} style={inputStyle} />
+            <div className="grid grid-cols-2 gap-2">
+              <select name="addressState" value={draft.addressState} onChange={(e) => set("addressState", e.target.value)} className={inputClass} style={inputStyle}>
+                <option value="">State</option>
+                {US_STATES.map(([code, name]) => (
+                  <option key={code} value={code}>{code} — {name}</option>
+                ))}
+              </select>
+              <input name="addressZip" value={draft.addressZip} onChange={(e) => set("addressZip", e.target.value)} placeholder="ZIP" className={inputClass} style={inputStyle} />
+            </div>
+          </div>
+        </Field>
 
-        <label>
-          Notes
-          <textarea name="notes" defaultValue={v("notes")} style={{ ...fieldStyle, minHeight: 60 }} />
-        </label>
+        <Field label="Notes">
+          <textarea
+            name="notes"
+            value={draft.notes}
+            onChange={(e) => set("notes", e.target.value)}
+            rows={3}
+            placeholder="e.g. ordering minimums, lead times, account rep…"
+            className={inputClass}
+            style={inputStyle}
+          />
+        </Field>
 
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          <button type="submit" className="btn btn-primary">
-            {submitLabel}
-          </button>
-          <Link href="/vendors" className="btn">
-            Cancel
-          </Link>
+        <div className="flex gap-3 pt-2">
+          <button type="submit" className="btn btn-primary">Add Vendor</button>
+          <Link href="/vendors" className="btn">Cancel</Link>
         </div>
       </form>
     </div>
