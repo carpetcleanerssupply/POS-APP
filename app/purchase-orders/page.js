@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { poTotal } from "@/lib/purchaseOrders";
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
 const STATUS_LABEL = { DRAFT: "Draft", ORDERED: "Ordered", PARTIAL: "Partially Received", RECEIVED: "Received" };
 
 export const dynamic = "force-dynamic";
@@ -14,45 +12,56 @@ export default async function PurchaseOrdersPage() {
   const pos = await prisma.purchaseOrder.findMany({ orderBy: { number: "desc" }, take: 200, include: { lines: true } });
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><Link href="/">&larr; Home</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Home</Link>
+      </p>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Purchase Orders</h1>
-        <Link href="/purchase-orders/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-          + New PO
-        </Link>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+        <div>
+          <div className="eyebrow mb-1">Purchasing</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>
+            Purchase Orders ({pos.length})
+          </h1>
+        </div>
+        <Link href="/purchase-orders/new" className="btn btn-primary">+ New PO</Link>
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
-        <thead>
-          <tr>
-            <th style={th}>#</th>
-            <th style={th}>Date</th>
-            <th style={th}>Vendor</th>
-            <th style={th}>Status</th>
-            <th style={th}>Paid</th>
-            <th style={{ ...th, textAlign: "right" }}>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pos.map((po) => (
-            <tr key={po.id}>
-              <td style={td}><Link href={`/purchase-orders/${po.id}`}>{po.number}</Link></td>
-              <td style={td}>{new Date(po.date).toLocaleDateString()}</td>
-              <td style={td}>{po.vendorName}</td>
-              <td style={td}>{STATUS_LABEL[po.status]}</td>
-              <td style={td}>{po.paid ? "Yes" : "No"}</td>
-              <td style={{ ...td, textAlign: "right" }}>${poTotal(po.lines).toFixed(2)}</td>
+      <div className="card overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr style={{ backgroundColor: "var(--paper)" }}>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>#</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Date</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Vendor</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Status</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Paid</th>
+              <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Total</th>
             </tr>
-          ))}
-          {pos.length === 0 && (
-            <tr>
-              <td style={td} colSpan={6}>No purchase orders yet.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {pos.map((po) => (
+              <tr key={po.id}>
+                <td className="px-3 py-2 border-t hairline">
+                  <Link href={`/purchase-orders/${po.id}`} className="font-medium" style={{ color: "var(--deep)" }}>{po.number}</Link>
+                </td>
+                <td className="px-3 py-2 border-t hairline" style={{ color: "var(--faint)" }}>{new Date(po.date).toLocaleDateString()}</td>
+                <td className="px-3 py-2 border-t hairline">{po.vendorName}</td>
+                <td className="px-3 py-2 border-t hairline">{STATUS_LABEL[po.status]}</td>
+                <td className="px-3 py-2 border-t hairline">{po.paid ? "Yes" : "No"}</td>
+                <td className="px-3 py-2 border-t hairline text-right mono font-medium">${poTotal(po.lines).toFixed(2)}</td>
+              </tr>
+            ))}
+            {pos.length === 0 && (
+              <tr>
+                <td className="px-3 py-8 text-center text-sm border-t hairline" colSpan={6} style={{ color: "var(--faint)" }}>
+                  No purchase orders yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }
