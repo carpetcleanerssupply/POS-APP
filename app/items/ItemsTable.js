@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import DeleteItemButton from "./DeleteItemButton";
 
 const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
+const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #e6ddc9" };
 
 export default function ItemsTable({ items }) {
   const router = useRouter();
@@ -14,6 +14,19 @@ export default function ItemsTable({ items }) {
   const [draft, setDraft] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState("");
+
+  const filteredItems = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter(
+      (item) =>
+        item.sku.toLowerCase().includes(q) ||
+        item.name.toLowerCase().includes(q) ||
+        (item.category || "").toLowerCase().includes(q) ||
+        (item.vendorName || "").toLowerCase().includes(q)
+    );
+  }, [items, query]);
 
   function cancelBulk() {
     setBulkMode(false);
@@ -48,7 +61,15 @@ export default function ItemsTable({ items }) {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginBottom: "0.75rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.75rem" }}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search SKU, name, category, vendor..."
+          style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
+        />
+        <div style={{ display: "flex", gap: "0.75rem" }}>
         {bulkMode ? (
           <>
             <button type="button" onClick={cancelBulk} disabled={busy} style={{ padding: "0.4rem 0.8rem", cursor: "pointer" }}>
@@ -68,6 +89,7 @@ export default function ItemsTable({ items }) {
             Update Stock
           </button>
         )}
+        </div>
       </div>
 
       {bulkMode && (
@@ -78,7 +100,20 @@ export default function ItemsTable({ items }) {
       )}
       {error && <p style={{ color: "#c62828" }}>{error}</p>}
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+        <colgroup>
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "22%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "11%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "6%" }} />
+          <col style={{ width: "8%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "6%" }} />
+          <col style={{ width: "7%" }} />
+        </colgroup>
         <thead>
           <tr>
             <th style={th}>SKU</th>
@@ -95,10 +130,10 @@ export default function ItemsTable({ items }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
+          {filteredItems.map((item, index) => (
+            <tr key={item.id} style={{ background: index % 2 === 1 ? "#f7f2e8" : "#fff" }}>
               <td style={td}>{item.sku}</td>
-              <td style={td}>{item.name}</td>
+              <td style={{ ...td, whiteSpace: "normal", wordBreak: "break-word" }}>{item.name}</td>
               <td style={td}>{item.category || "—"}</td>
               <td style={td}>{item.vendorName || "—"}</td>
               <td style={td}>${item.cost.toFixed(2)}</td>
@@ -133,7 +168,7 @@ export default function ItemsTable({ items }) {
               </td>
             </tr>
           ))}
-          {items.length === 0 && (
+          {filteredItems.length === 0 && (
             <tr>
               <td style={td} colSpan={11}>No items match your filters.</td>
             </tr>
