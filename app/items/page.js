@@ -23,45 +23,49 @@ export default async function ItemsPage({ searchParams }) {
   const errorMessage = params?.error && DELETE_ERROR_MESSAGES[params.error]?.(params.count);
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 1600 }}>
-      <p><Link href="/">&larr; Home</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Home</Link>
+      </p>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
-        <h1>Items</h1>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/api/items/export" className="btn btn-sm">Export CSV</Link>
-          <Link href="/items/import" className="btn btn-sm">Import CSV</Link>
-          <Link href="/items/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-            + Add Item
-          </Link>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+        <div>
+          <div className="eyebrow mb-1">Item Database</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>
+            Items ({allItems.length})
+          </h1>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          {lowStockCount > 0 && (
+            <Link
+              href={lowOnly ? "/items" : "/items?low=1"}
+              className="btn"
+              style={
+                lowOnly
+                  ? { backgroundColor: "var(--rust)", color: "#fff", borderColor: "var(--rust)" }
+                  : { backgroundColor: "var(--rust-bg)", color: "var(--rust)", borderColor: "var(--rust)" }
+              }
+            >
+              {lowOnly ? "Showing Low Stock" : `⚠ ${lowStockCount} Low Stock`}
+            </Link>
+          )}
+          <Link href="/api/items/export" className="btn">Export CSV</Link>
+          <Link href="/items/import" className="btn">Import CSV</Link>
+          <Link href="/items/new" className="btn btn-primary">+ Add Item</Link>
         </div>
       </div>
 
       {errorMessage && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p
+          className="mb-4 px-4 py-3 rounded-lg text-sm"
+          style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}
+        >
           {errorMessage}
         </p>
       )}
 
-      <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", margin: "1.25rem 0" }}>
-        <Link
-          href={lowOnly ? "/items" : "/items?low=1"}
-          style={{
-            padding: "0.5rem 0.9rem",
-            borderRadius: 6,
-            border: "1px solid #c62828",
-            color: lowOnly ? "#fff" : "#c62828",
-            background: lowOnly ? "#c62828" : "transparent",
-            textDecoration: "none",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {lowOnly ? "Showing Low Stock" : `⚠ ${lowStockCount} Low Stock`}
-        </Link>
-      </div>
-
       {allItems.length === 0 ? (
-        <p>No items yet.</p>
+        <p className="text-sm" style={{ color: "var(--faint)" }}>No items yet.</p>
       ) : (
         <ItemsTable
           items={items.map((item) => ({

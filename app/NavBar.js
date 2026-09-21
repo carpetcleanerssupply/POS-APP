@@ -20,21 +20,6 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Admin", ownerOnly: true },
 ];
 
-const tabStyle = {
-  padding: "0.5rem 0.8rem",
-  borderRadius: 6,
-  fontSize: "0.9rem",
-  whiteSpace: "nowrap",
-  color: "#dce6f0",
-};
-
-const activeTabStyle = {
-  ...tabStyle,
-  background: "#f7f2e8",
-  color: "#1e3a5f",
-  fontWeight: 600,
-};
-
 export default function NavBar({ tierOwner }) {
   const pathname = usePathname();
   const items = NAV_ITEMS.filter((item) => !item.ownerOnly || tierOwner);
@@ -48,22 +33,26 @@ export default function NavBar({ tierOwner }) {
 
   return (
     <nav
-      className="no-print"
-      style={{
-        display: "flex",
-        gap: "0.35rem",
-        flexWrap: "nowrap",
-        overflowX: "auto",
-        padding: "0.5rem 1rem",
-        marginTop: "0.6rem",
-        background: "#1e3a5f",
-      }}
+      className="no-print flex gap-1 px-4 md:px-6 pt-2 border-b hairline overflow-x-auto"
+      style={{ backgroundColor: "var(--panel)" }}
     >
-      {items.map((item) => (
-        <Link key={item.href} href={item.href} style={item.href === activeHref ? activeTabStyle : tabStyle}>
-          {item.label}
-        </Link>
-      ))}
+      {items.map((item) => {
+        const isActive = item.href === activeHref;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="px-3 py-2.5 text-sm font-semibold whitespace-nowrap rounded-t-md"
+            style={{
+              backgroundColor: isActive ? "var(--paper)" : "transparent",
+              color: isActive ? "var(--deep)" : "var(--faint)",
+              borderBottom: isActive ? "2px solid var(--deep)" : "2px solid transparent",
+            }}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
