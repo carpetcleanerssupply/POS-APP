@@ -35,14 +35,26 @@ export default function ItemsTable({ items }) {
   }
 
   async function saveAll() {
-    const changed = Object.entries(draft).filter(([, val]) => val !== "" && !isNaN(Number(val)));
-    if (changed.length === 0) {
+    const updates = {};
+    for (const [id, fields] of Object.entries(draft)) {
+      const entry = {};
+      if (fields.stock !== undefined && fields.stock !== "" && !isNaN(Number(fields.stock))) {
+        entry.stock = Math.max(0, Math.floor(Number(fields.stock)));
+      }
+      if (fields.unit !== undefined) {
+        entry.unit = fields.unit;
+      }
+      if (fields.caseQty !== undefined && fields.caseQty !== "" && !isNaN(Number(fields.caseQty))) {
+        entry.caseQty = Math.max(1, Math.floor(Number(fields.caseQty)));
+      }
+      if (Object.keys(entry).length > 0) updates[id] = entry;
+    }
+    if (Object.keys(updates).length === 0) {
       cancelBulk();
       return;
     }
     setBusy(true);
     setError(null);
-    const updates = Object.fromEntries(changed.map(([id, val]) => [id, Math.max(0, Math.floor(Number(val)))]));
     const res = await fetch("/api/items/bulk-update-stock", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -94,21 +106,21 @@ export default function ItemsTable({ items }) {
 
       {bulkMode && (
         <p style={{ background: "#f7f2e8", padding: "0.6rem 0.9rem", borderRadius: 8, fontSize: "0.85rem", color: "#555" }}>
-          Use the search box above to filter first if that&apos;s easier — then just tab down the Stock column entering
-          counts. Nothing saves until you click &quot;Save All.&quot;
+          Use the search box above to filter first if that&apos;s easier — then edit Unit, Units/Case, and Stock right
+          in the table. Nothing saves until you click &quot;Save All.&quot;
         </p>
       )}
       {error && <p style={{ color: "#c62828" }}>{error}</p>}
 
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
         <colgroup>
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "34%" }} />
           <col style={{ width: "8%" }} />
-          <col style={{ width: "30%" }} />
           <col style={{ width: "9%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "6%" }} />
-          <col style={{ width: "6%" }} />
           <col style={{ width: "5%" }} />
+          <col style={{ width: "5%" }} />
+          <col style={{ width: "6%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "6%" }} />
           <col style={{ width: "5%" }} />
@@ -138,8 +150,33 @@ export default function ItemsTable({ items }) {
               <td style={td}>{item.vendorName || "—"}</td>
               <td style={td}>${item.cost.toFixed(2)}</td>
               <td style={td}>${item.price.toFixed(2)}</td>
-              <td style={td}>{item.unit || "—"}</td>
-              <td style={td}>{item.caseQty > 1 ? item.caseQty : "—"}</td>
+              <td style={td}>
+                {bulkMode ? (
+                  <input
+                    type="text"
+                    defaultValue={item.unit || ""}
+                    placeholder="ea"
+                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], unit: e.target.value } }))}
+                    style={{ width: "100%", padding: "0.3rem" }}
+                  />
+                ) : (
+                  item.unit || "—"
+                )}
+              </td>
+              <td style={td}>
+                {bulkMode ? (
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    defaultValue={item.caseQty || 1}
+                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], caseQty: e.target.value } }))}
+                    style={{ width: "100%", padding: "0.3rem" }}
+                  />
+                ) : (
+                  item.caseQty > 1 ? item.caseQty : "—"
+                )}
+              </td>
               <td style={td}>
                 {bulkMode ? (
                   <input
@@ -147,7 +184,7 @@ export default function ItemsTable({ items }) {
                     min="0"
                     step="1"
                     defaultValue={item.stock}
-                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: e.target.value }))}
+                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], stock: e.target.value } }))}
                     style={{ width: 70, padding: "0.3rem" }}
                   />
                 ) : (
