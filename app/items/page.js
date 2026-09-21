@@ -13,27 +13,17 @@ const DELETE_ERROR_MESSAGES = {
 export default async function ItemsPage({ searchParams }) {
   await requireSession();
   const params = await searchParams;
-  const q = (params?.q || "").trim().toLowerCase();
   const lowOnly = params?.low === "1";
 
   const allItems = await prisma.item.findMany({ orderBy: { name: "asc" } });
 
-  const items = allItems.filter((item) => {
-    const matchesQuery =
-      !q ||
-      item.sku.toLowerCase().includes(q) ||
-      item.name.toLowerCase().includes(q) ||
-      (item.category || "").toLowerCase().includes(q) ||
-      (item.vendorName || "").toLowerCase().includes(q);
-    const matchesLow = !lowOnly || isLowStock(item);
-    return matchesQuery && matchesLow;
-  });
+  const items = allItems.filter((item) => !lowOnly || isLowStock(item));
 
   const lowStockCount = allItems.filter(isLowStock).length;
   const errorMessage = params?.error && DELETE_ERROR_MESSAGES[params.error]?.(params.count);
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
+    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 1100 }}>
       <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
@@ -53,18 +43,9 @@ export default async function ItemsPage({ searchParams }) {
         </p>
       )}
 
-      <form method="GET" style={{ display: "flex", gap: "0.75rem", alignItems: "center", margin: "1.25rem 0" }}>
-        <input
-          type="text"
-          name="q"
-          defaultValue={params?.q || ""}
-          placeholder="Search SKU, name, category, vendor..."
-          style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
-        />
-        {lowOnly && <input type="hidden" name="low" value="1" />}
-        <button type="submit" className="btn btn-sm">Search</button>
+      <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", margin: "1.25rem 0" }}>
         <Link
-          href={lowOnly ? `/items${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/items?low=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
+          href={lowOnly ? "/items" : "/items?low=1"}
           style={{
             padding: "0.5rem 0.9rem",
             borderRadius: 6,
@@ -77,7 +58,7 @@ export default async function ItemsPage({ searchParams }) {
         >
           {lowOnly ? "Showing Low Stock" : `⚠ ${lowStockCount} Low Stock`}
         </Link>
-      </form>
+      </div>
 
       {allItems.length === 0 ? (
         <p>No items yet.</p>
