@@ -23,7 +23,7 @@ export default async function ItemsPage({ searchParams }) {
   const errorMessage = params?.error && DELETE_ERROR_MESSAGES[params.error]?.(params.count);
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 1100 }}>
+    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 1600 }}>
       <p><Link href="/">&larr; Home</Link></p>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
