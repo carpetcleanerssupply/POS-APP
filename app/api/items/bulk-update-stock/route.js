@@ -8,19 +8,38 @@ export async function POST(request) {
   const body = await request.json().catch(() => null);
   const updates = body?.updates;
   if (!updates || typeof updates !== "object" || Object.keys(updates).length === 0) {
-    return Response.json({ error: "No stock updates given." }, { status: 400 });
+    return Response.json({ error: "No updates given." }, { status: 400 });
   }
 
   const entries = Object.entries(updates)
-    .map(([id, stock]) => [id, Math.max(0, Math.floor(Number(stock)))])
-    .filter(([, stock]) => Number.isFinite(stock));
+    .map(([id, fields]) => {
+      const data = {};
+      if (fields && fields.stock !== undefined) {
+        const stock = Math.max(0, Math.floor(Number(fields.stock)));
+        if (Number.isFinite(stock)) data.stock = stock;
+      }
+      if (fields && fields.unit !== undefined) {
+        const unit = String(fields.unit).trim();
+        data.unit = unit === "" ? null : unit;
+      }
+      if (fields && fields.caseQty !== undefined) {
+        const caseQty = Math.max(1, Math.floor(Number(fields.caseQty)));
+        if (Number.isFinite(caseQty)) data.caseQty = caseQty;
+      }
+      return [id, data];
+    })
+    .filter(([, data]) => Object.keys(data).length > 0);
 
-  await prisma.$transaction(entries.map(([id, stock]) => prisma.item.update({ where: { id }, data: { stock } })));
+  if (entries.length === 0) {
+    return Response.json({ error: "No valid updates given." }, { status: 400 });
+  }
+
+  await prisma.$transaction(entries.map(([id, data]) => prisma.item.update({ where: { id }, data })));
 
   await prisma.activityLog.create({
     data: {
       userId: session.user.id,
-      action: "Bulk stock update",
+      action: "Bulk item update",
       details: { count: entries.length },
     },
   });
