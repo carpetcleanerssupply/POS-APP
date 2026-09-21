@@ -35,46 +35,51 @@ export default function DashboardActivityLog({ entries }) {
   }
 
   return (
-    <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h3 style={{ marginTop: 0 }}>Activity Log</h3>
-        <button type="button" className="btn btn-sm" onClick={() => setShow((s) => !s)}>
+    <div className="card p-5">
+      <div className="flex items-center justify-between" style={{ marginBottom: show ? 12 : 0 }}>
+        <div>
+          <div className="eyebrow">Activity Log</div>
+          {!show && (
+            <div className="text-xs mt-1" style={{ color: "var(--faint)" }}>
+              Every action, with who did it and when — pulled up on demand rather than left running for everyone to see.
+            </div>
+          )}
+        </div>
+        <button type="button" onClick={() => setShow((s) => !s)} className="btn btn-sm whitespace-nowrap">
           {show ? "Hide" : "View Activity Log"}
         </button>
       </div>
 
       {show && (
         <>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.75rem", flexWrap: "wrap" }}>
-            <label style={{ fontSize: "0.85rem" }}>
-              From <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={{ padding: "0.3rem" }} />
-            </label>
-            <label style={{ fontSize: "0.85rem" }}>
-              To <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={{ padding: "0.3rem" }} />
-            </label>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <label className="text-xs" style={{ color: "var(--faint)" }}>From</label>
+            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="px-2 py-1 rounded border hairline focus-amber text-sm" style={{ backgroundColor: "var(--panel)" }} />
+            <label className="text-xs" style={{ color: "var(--faint)" }}>To</label>
+            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="px-2 py-1 rounded border hairline focus-amber text-sm" style={{ backgroundColor: "var(--panel)" }} />
             {(from || to) && (
-              <button type="button" className="btn btn-sm" onClick={() => { setFrom(""); setTo(""); }}>
+              <button type="button" onClick={() => { setFrom(""); setTo(""); }} className="text-xs font-medium" style={{ color: "var(--faint)" }}>
                 Clear
               </button>
             )}
             {filtered.length > 0 && (
-              <button type="button" className="btn btn-sm" onClick={exportCsv} style={{ marginLeft: "auto" }}>
+              <button type="button" onClick={exportCsv} className="btn btn-sm ml-auto">
                 Export CSV
               </button>
             )}
           </div>
 
           {filtered.length === 0 ? (
-            <p style={{ color: "#777", fontSize: "0.9rem" }}>Nothing logged in this range.</p>
+            <div className="text-sm" style={{ color: "var(--faint)" }}>Nothing logged in this range.</div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: 380, overflow: "auto" }}>
+            <div className="flex flex-col gap-2" style={{ maxHeight: 380, overflow: "auto" }}>
               {filtered.map((a) => (
-                <div key={a.id} style={{ fontSize: "0.85rem", borderBottom: "1px solid #eee", paddingBottom: "0.4rem" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div key={a.id} className="text-sm border-b hairline pb-2 last:border-0">
+                  <div className="flex justify-between">
                     <span>{a.action}</span>
-                    <span style={{ color: "#777" }}>{new Date(a.timestamp).toLocaleString()}</span>
+                    <span className="text-xs" style={{ color: "var(--faint)" }}>{new Date(a.timestamp).toLocaleString()}</span>
                   </div>
-                  <div style={{ color: "#777" }}>
+                  <div className="text-xs" style={{ color: "var(--faint)" }}>
                     {a.userName ? `by ${a.userName}` : "user not recorded"}
                     {a.detailsText ? ` — ${a.detailsText}` : ""}
                   </div>
