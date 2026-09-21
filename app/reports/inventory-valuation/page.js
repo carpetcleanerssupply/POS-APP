@@ -3,17 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { isOwnerManager } from "@/lib/authz";
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
-
 export const dynamic = "force-dynamic";
 
 export default async function InventoryValuationPage() {
   const session = await requireSession();
   if (!isOwnerManager(session)) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>Inventory Valuation is only available to Owner/Manager logins.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">Inventory Valuation is only available to Owner/Manager logins.</p>
       </main>
     );
   }
@@ -30,51 +27,60 @@ export default async function InventoryValuationPage() {
   const grandTotal = items.reduce((sum, i) => sum + i.stock * Number(i.cost), 0);
   const grandUnits = items.reduce((sum, i) => sum + i.stock, 0);
 
+  const th = "px-3 py-2 text-left font-medium text-xs uppercase tracking-wide";
+
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 900 }}>
-      <p><Link href="/admin">&larr; Admin</Link></p>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h1>Inventory Valuation</h1>
-        <Link href="/api/reports/inventory-valuation/export" className="btn btn-sm">Export CSV</Link>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/admin" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Admin</Link>
+      </p>
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
+        <div>
+          <div className="eyebrow mb-1">Reports</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Inventory Valuation</h1>
+        </div>
+        <Link href="/api/reports/inventory-valuation/export" className="btn">Export CSV</Link>
       </div>
-      <p style={{ fontWeight: 700 }}>
+      <p className="text-sm font-semibold mb-5" style={{ color: "var(--deep)" }}>
         Total: ${grandTotal.toFixed(2)} across {grandUnits} unit{grandUnits === 1 ? "" : "s"}
       </p>
 
       {categories.map(([cat, catItems]) => {
         const catTotal = catItems.reduce((sum, i) => sum + i.stock * Number(i.cost), 0);
         return (
-          <div key={cat} style={{ marginTop: "1.5rem" }}>
-            <h3>{cat} — ${catTotal.toFixed(2)}</h3>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th style={th}>SKU</th>
-                  <th style={th}>Item</th>
-                  <th style={th}>Vendor</th>
-                  <th style={th}>Qty</th>
-                  <th style={th}>Unit Cost</th>
-                  <th style={th}>Total Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {catItems.map((i) => (
-                  <tr key={i.id}>
-                    <td style={td}>{i.sku}</td>
-                    <td style={td}>{i.name}</td>
-                    <td style={td}>{i.vendorName || "—"}</td>
-                    <td style={td}>{i.stock}</td>
-                    <td style={td}>${Number(i.cost).toFixed(2)}</td>
-                    <td style={td}>${(i.stock * Number(i.cost)).toFixed(2)}</td>
+          <div key={cat} className="mb-6">
+            <h3 className="text-base font-semibold mb-2" style={{ color: "var(--ink)" }}>{cat} — ${catTotal.toFixed(2)}</h3>
+            <div className="card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ backgroundColor: "var(--paper)" }}>
+                    <th className={th} style={{ color: "var(--faint)" }}>SKU</th>
+                    <th className={th} style={{ color: "var(--faint)" }}>Item</th>
+                    <th className={th} style={{ color: "var(--faint)" }}>Vendor</th>
+                    <th className={th} style={{ color: "var(--faint)" }}>Qty</th>
+                    <th className={th} style={{ color: "var(--faint)" }}>Unit Cost</th>
+                    <th className={th} style={{ color: "var(--faint)" }}>Total Value</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {catItems.map((i) => (
+                    <tr key={i.id}>
+                      <td className="px-3 py-2 border-t hairline mono" style={{ color: "var(--faint)" }}>{i.sku}</td>
+                      <td className="px-3 py-2 border-t hairline">{i.name}</td>
+                      <td className="px-3 py-2 border-t hairline" style={{ color: "var(--faint)" }}>{i.vendorName || "—"}</td>
+                      <td className="px-3 py-2 border-t hairline">{i.stock}</td>
+                      <td className="px-3 py-2 border-t hairline mono">${Number(i.cost).toFixed(2)}</td>
+                      <td className="px-3 py-2 border-t hairline mono font-medium">${(i.stock * Number(i.cost)).toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
       })}
 
-      {items.length === 0 && <p style={{ color: "#777" }}>No items yet.</p>}
+      {items.length === 0 && <p className="text-sm" style={{ color: "var(--faint)" }}>No items yet.</p>}
     </main>
   );
 }
