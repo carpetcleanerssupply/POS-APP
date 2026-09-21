@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
+
 export default function DashboardEmployees({ users, canManage, currentUserId }) {
   const router = useRouter();
   const [showAdd, setShowAdd] = useState(false);
@@ -50,50 +53,52 @@ export default function DashboardEmployees({ users, canManage, currentUserId }) 
   }
 
   return (
-    <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h3 style={{ marginTop: 0 }}>Employees</h3>
+    <div className="card p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="eyebrow">Employees</div>
         {canManage && (
-          <button type="button" className="btn btn-sm" onClick={() => setShowAdd((s) => !s)}>
+          <button type="button" onClick={() => setShowAdd((s) => !s)} className="btn btn-sm">
             {showAdd ? "Cancel" : "+ Add"}
           </button>
         )}
       </div>
 
-      {error && <p style={{ color: "#c62828" }}>{error}</p>}
+      {error && <p className="text-sm mb-2" style={{ color: "var(--rust)" }}>{error}</p>}
 
       {showAdd && canManage && (
-        <form onSubmit={addUser} style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1rem" }}>
-          <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} style={{ padding: "0.4rem" }} required />
-          <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: "0.4rem" }} required />
-          <select value={tier} onChange={(e) => setTier(e.target.value)} style={{ padding: "0.5rem" }}>
+        <form onSubmit={addUser} className="flex flex-col gap-2 mb-4">
+          <input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className={inputClass} style={inputStyle} required />
+          <input placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} style={inputStyle} required />
+          <select value={tier} onChange={(e) => setTier(e.target.value)} className={inputClass} style={inputStyle}>
             <option value="STAFF">Staff</option>
             <option value="OWNER_MANAGER">Owner/Manager</option>
           </select>
-          <input type="password" placeholder="Temporary password (min 8 chars)" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: "0.4rem" }} required minLength={8} />
-          <button type="submit" className="btn btn-primary btn-sm" disabled={busy} style={{ alignSelf: "flex-start" }}>Create Login</button>
+          <input type="password" placeholder="Temporary password (min 8 chars)" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} style={inputStyle} required minLength={8} />
+          <button type="submit" disabled={busy} className="btn btn-sm btn-primary" style={{ alignSelf: "flex-start" }}>Create Login</button>
         </form>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      <div className="flex flex-col gap-2">
         {users.map((u) => (
-          <div key={u.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem", opacity: u.active ? 1 : 0.5 }}>
+          <div key={u.id} className="flex items-center justify-between text-sm border-b hairline pb-2 last:border-0" style={{ opacity: u.active ? 1 : 0.5 }}>
             <span>
-              {u.name} <span style={{ color: "#777", fontSize: "0.8rem" }}>({u.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"})</span>
+              {u.name} <span className="text-xs" style={{ color: "var(--faint)" }}>({u.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"})</span>
               {!u.active && " — inactive"}
             </span>
             {canManage && u.id !== currentUserId && (
               <button
                 type="button"
-                className={`btn btn-sm ${u.active ? "btn-danger" : ""}`}
                 disabled={busy}
                 onClick={() => setActive(u.id, !u.active)}
+                className="text-xs font-semibold"
+                style={{ color: u.active ? "var(--rust)" : "var(--deep)", cursor: "pointer" }}
               >
                 {u.active ? "Deactivate" : "Reactivate"}
               </button>
             )}
           </div>
         ))}
+        {users.length === 0 && <div className="text-sm" style={{ color: "var(--faint)" }}>No employees added yet.</div>}
       </div>
     </div>
   );

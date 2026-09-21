@@ -31,19 +31,14 @@ export default function CreatePOsFromLowStockButton() {
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={busy}
-        style={{ background: "none", border: "none", padding: 0, color: "#1e3a5f", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" }}
-      >
+      <button type="button" onClick={handleClick} disabled={busy} className="text-xs font-semibold" style={{ color: "var(--deep)", cursor: "pointer" }}>
         {busy ? "Creating..." : "Create PO(s) →"}
       </button>
-      {error && <p style={{ color: "#c62828", fontSize: "0.8rem", marginTop: "0.4rem" }}>{error}</p>}
+      {error && <p className="text-xs mt-1" style={{ color: "var(--rust)" }}>{error}</p>}
       {skipped && (
-        <p style={{ color: "#c62828", fontSize: "0.8rem", marginTop: "0.4rem" }}>
+        <p className="text-xs mt-1" style={{ color: "var(--rust)" }}>
           Created {skipped.createdCount} PO(s). Skipped items with no matching vendor record on file:{" "}
-          {skipped.vendorNames.join(", ")}. <Link href="/purchase-orders">View Purchase Orders</Link>
+          {skipped.vendorNames.join(", ")}. <Link href="/purchase-orders" className="underline">View Purchase Orders</Link>
         </p>
       )}
     </div>

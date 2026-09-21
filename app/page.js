@@ -9,10 +9,15 @@ import CreatePOsFromLowStockButton from "./CreatePOsFromLowStockButton";
 
 export const dynamic = "force-dynamic";
 
-const tile = { backgroundColor: "#f7f7f7", border: "1px solid #ddd", borderRadius: 8, padding: "1rem" };
-const tileLabel = { fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#777", marginBottom: "0.25rem" };
-const tileValue = { fontSize: "1.6rem", fontWeight: 700, fontFamily: "monospace" };
-const tileSub = { fontSize: "0.75rem", color: "#777", marginTop: "0.25rem" };
+function Tile({ label, value, valueColor, sub }) {
+  return (
+    <div className="card p-4">
+      <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>{label}</div>
+      <div className="text-2xl font-semibold mono" style={{ color: valueColor || "var(--deep)" }}>{value}</div>
+      {sub && <div className="text-xs mt-1" style={{ color: "var(--faint)" }}>{sub}</div>}
+    </div>
+  );
+}
 
 export default async function Home() {
   const session = await requireSession();
@@ -41,50 +46,50 @@ export default async function Home() {
   }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem 3rem 3rem", maxWidth: 960 }}>
-      <h1>Dashboard</h1>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", margin: "1.5rem 0" }}>
-        <div style={tile}>
-          <div style={tileLabel}>Overdue Invoices</div>
-          <div style={{ ...tileValue, color: overdueCount > 0 ? "#c62828" : "#2e7d32" }}>{overdueCount}</div>
-          <div style={tileSub}>past due date, unpaid</div>
-        </div>
-        <div style={tile}>
-          <div style={tileLabel}>Total A/R</div>
-          {owner ? (
-            <div style={{ ...tileValue, color: totalAR > 0 ? "#c62828" : "#2e7d32" }}>${totalAR.toFixed(2)}</div>
-          ) : (
-            <div style={tileValue}>{openInvoices.length}</div>
-          )}
-          <div style={tileSub}>{openInvoices.length} open invoice{openInvoices.length === 1 ? "" : "s"}</div>
-        </div>
-        <div style={tile}>
-          <div style={tileLabel}>Low Stock</div>
-          <div style={{ ...tileValue, color: lowStockItems.length > 0 ? "#c62828" : "#2e7d32" }}>{lowStockItems.length}</div>
-          <div style={tileSub}>item{lowStockItems.length === 1 ? "" : "s"} running low</div>
-        </div>
-        <div style={tile}>
-          <div style={tileLabel}>Open Purchase Orders</div>
-          <div style={tileValue}>{openPOCount}</div>
-          {draftInvoiceCount > 0 && (
-            <div style={tileSub}>{draftInvoiceCount} invoice draft{draftInvoiceCount === 1 ? "" : "s"} pending too</div>
-          )}
-        </div>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Overview</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Dashboard</h1>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <Tile
+          label="Overdue Invoices"
+          value={overdueCount}
+          valueColor={overdueCount > 0 ? "var(--rust)" : "var(--moss)"}
+          sub="past due date, unpaid"
+        />
+        <Tile
+          label="Total A/R"
+          value={owner ? `$${totalAR.toFixed(2)}` : openInvoices.length}
+          valueColor={owner ? (totalAR > 0 ? "var(--rust)" : "var(--moss)") : undefined}
+          sub={`${openInvoices.length} open invoice${openInvoices.length === 1 ? "" : "s"}`}
+        />
+        <Tile
+          label="Low Stock"
+          value={lowStockItems.length}
+          valueColor={lowStockItems.length > 0 ? "var(--rust)" : "var(--moss)"}
+          sub={`item${lowStockItems.length === 1 ? "" : "s"} running low`}
+        />
+        <Tile
+          label="Open Purchase Orders"
+          value={openPOCount}
+          sub={draftInvoiceCount > 0 ? `${draftInvoiceCount} invoice draft${draftInvoiceCount === 1 ? "" : "s"} pending too` : undefined}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {lowStockItems.length > 0 && (
-          <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.4rem" }}>
-              <h3 style={{ margin: 0 }}>Needs Reordering</h3>
+          <div className="card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="eyebrow">Needs Reordering</div>
               <CreatePOsFromLowStockButton />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <div className="flex flex-col gap-2">
               {lowStockItems.slice(0, 8).map((i) => (
-                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
-                  <span>{i.name} <span style={{ color: "#777", fontSize: "0.8rem" }}>({i.sku})</span></span>
-                  <span style={{ color: "#c62828" }}>{i.stock} left</span>
+                <div key={i.id} className="flex items-center justify-between text-sm">
+                  <span>{i.name} <span className="mono text-xs" style={{ color: "var(--faint)" }}>({i.sku})</span></span>
+                  <span className="mono" style={{ color: "var(--rust)" }}>{i.stock} left</span>
                 </div>
               ))}
             </div>
