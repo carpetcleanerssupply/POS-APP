@@ -12,7 +12,7 @@ export async function POST(request, { params }) {
   const data = parseCustomerForm(form);
 
   if (!isValidCustomer(data)) {
-    return NextResponse.redirect(`${origin}/customers/${id}/edit?error=required`, { status: 303 });
+    return NextResponse.redirect(`${origin}/customers?selected=${id}&edit=1&error=required`, { status: 303 });
   }
 
   try {
@@ -24,5 +24,5 @@ export async function POST(request, { params }) {
     throw error;
   }
 
-  return NextResponse.redirect(`${origin}/customers/${id}/edit?saved=1`, { status: 303 });
+  return NextResponse.redirect(`${origin}/customers?selected=${id}&saved=1`, { status: 303 });
 }

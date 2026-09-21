@@ -5,9 +5,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import DeleteItemButton from "./DeleteItemButton";
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #e6ddc9" };
-
 export default function ItemsTable({ items }) {
   const router = useRouter();
   const [bulkMode, setBulkMode] = useState(false);
@@ -71,144 +68,160 @@ export default function ItemsTable({ items }) {
     router.refresh();
   }
 
+  const th = "px-3 py-2 text-left font-medium text-xs uppercase tracking-wide";
+  const td = "px-3 py-2 border-t hairline";
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.75rem" }}>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search SKU, name, category, vendor..."
-          style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
+          placeholder="Search by SKU, name, category, or vendor…"
+          className="w-full md:max-w-sm px-3 py-2.5 rounded border hairline focus-amber text-sm"
+          style={{ backgroundColor: "var(--panel)" }}
         />
-        <div style={{ display: "flex", gap: "0.75rem" }}>
-        {bulkMode ? (
-          <>
-            <button type="button" onClick={cancelBulk} disabled={busy} style={{ padding: "0.4rem 0.8rem", cursor: "pointer" }}>
-              Cancel
+        <div className="flex gap-2">
+          {bulkMode ? (
+            <>
+              <button type="button" onClick={cancelBulk} disabled={busy} className="btn">
+                Cancel
+              </button>
+              <button type="button" onClick={saveAll} disabled={busy} className="btn btn-primary">
+                {busy ? "Saving..." : "Save All"}
+              </button>
+            </>
+          ) : (
+            <button type="button" onClick={() => setBulkMode(true)} className="btn">
+              Update Stock
             </button>
-            <button
-              type="button"
-              onClick={saveAll}
-              disabled={busy}
-              style={{ padding: "0.4rem 0.8rem", background: "#1e3a5f", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
-            >
-              {busy ? "Saving..." : "Save All"}
-            </button>
-          </>
-        ) : (
-          <button type="button" onClick={() => setBulkMode(true)} style={{ padding: "0.4rem 0.8rem", cursor: "pointer" }}>
-            Update Stock
-          </button>
-        )}
+          )}
         </div>
       </div>
 
       {bulkMode && (
-        <p style={{ background: "#f7f2e8", padding: "0.6rem 0.9rem", borderRadius: 8, fontSize: "0.85rem", color: "#555" }}>
+        <div className="mb-3 px-4 py-2.5 rounded-md text-sm" style={{ backgroundColor: "var(--paper)", color: "var(--faint)" }}>
           Use the search box above to filter first if that&apos;s easier — then edit Unit, Units/Case, and Stock right
           in the table. Nothing saves until you click &quot;Save All.&quot;
-        </p>
+        </div>
       )}
-      {error && <p style={{ color: "#c62828" }}>{error}</p>}
+      {error && <p className="mb-3 text-sm" style={{ color: "var(--rust)" }}>{error}</p>}
 
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-        <colgroup>
-          <col style={{ width: "8%" }} />
-          <col style={{ width: "38%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "5%" }} />
-          <col style={{ width: "5%" }} />
-          <col style={{ width: "6%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "6%" }} />
-          <col style={{ width: "5%" }} />
-          <col style={{ width: "10%" }} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th style={th}>SKU</th>
-            <th style={th}>Name</th>
-            <th style={th}>Vendor</th>
-            <th style={th}>Cost</th>
-            <th style={th}>Price</th>
-            <th style={th}>Unit</th>
-            <th style={th}>Units/Case</th>
-            <th style={th}>Stock</th>
-            <th style={th} title="Cases + individual units — a case-friendly read on Stock, for whoever's counting shelves">CS+EA</th>
-            <th style={th}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredItems.map((item, index) => (
-            <tr key={item.id} style={{ background: index % 2 === 1 ? "#f7f2e8" : "#fff" }}>
-              <td style={td}>{item.sku}</td>
-              <td style={{ ...td, whiteSpace: "normal", wordBreak: "break-word" }}>{item.name}</td>
-              <td style={td}>{item.vendorName || "—"}</td>
-              <td style={td}>${item.cost.toFixed(2)}</td>
-              <td style={td}>${item.price.toFixed(2)}</td>
-              <td style={td}>
-                {bulkMode ? (
-                  <input
-                    type="text"
-                    defaultValue={item.unit || ""}
-                    placeholder="ea"
-                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], unit: e.target.value } }))}
-                    style={{ width: "100%", padding: "0.3rem" }}
-                  />
-                ) : (
-                  item.unit || "—"
-                )}
-              </td>
-              <td style={td}>
-                {bulkMode ? (
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    defaultValue={item.caseQty || 1}
-                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], caseQty: e.target.value } }))}
-                    style={{ width: "100%", padding: "0.3rem" }}
-                  />
-                ) : (
-                  item.caseQty > 1 ? item.caseQty : "—"
-                )}
-              </td>
-              <td style={td}>
-                {bulkMode ? (
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    defaultValue={item.stock}
-                    onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], stock: e.target.value } }))}
-                    style={{ width: 70, padding: "0.3rem" }}
-                  />
-                ) : (
-                  <>
-                    {item.stock}
-                    {item.lowStockTitle && <span title={item.lowStockTitle}> ⚠</span>}
-                  </>
-                )}
-              </td>
-              <td style={td}>{item.casesPlusEach || "—"}</td>
-              <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                {!bulkMode && (
-                  <>
-                    <Link href={`/items/${item.id}/edit`}>Edit</Link>
-                    <DeleteItemButton itemId={item.id} itemName={item.name} />
-                  </>
-                )}
-              </td>
+      <div className="card overflow-hidden">
+        <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
+          <colgroup>
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "34%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "6%" }} />
+            <col style={{ width: "6%" }} />
+            <col style={{ width: "7%" }} />
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "7%" }} />
+            <col style={{ width: "6%" }} />
+            <col style={{ width: "8%" }} />
+          </colgroup>
+          <thead>
+            <tr style={{ backgroundColor: "var(--paper)" }}>
+              <th className={th} style={{ color: "var(--faint)" }}>SKU</th>
+              <th className={th} style={{ color: "var(--faint)" }}>Item Name</th>
+              <th className={th} style={{ color: "var(--faint)" }}>Vendor</th>
+              <th className={`${th} text-right`} style={{ color: "var(--faint)" }}>Cost</th>
+              <th className={`${th} text-right`} style={{ color: "var(--faint)" }}>Price</th>
+              <th className={`${th} text-center`} style={{ color: "var(--faint)" }}>Unit</th>
+              <th className={`${th} text-center`} style={{ color: "var(--faint)" }}>Units/Case</th>
+              <th className={`${th} text-center`} style={{ color: "var(--faint)" }}>Stock</th>
+              <th
+                className={`${th} text-center`}
+                style={{ color: "var(--faint)" }}
+                title="Cases + individual units — a case-friendly read on Stock, for whoever's counting shelves"
+              >
+                CS+EA
+              </th>
+              <th className={th}></th>
             </tr>
-          ))}
-          {filteredItems.length === 0 && (
-            <tr>
-              <td style={td} colSpan={10}>No items match your filters.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredItems.map((item) => (
+              <tr key={item.id}>
+                <td className={`${td} mono`} style={{ color: "var(--faint)" }}>{item.sku}</td>
+                <td className={td} style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+                  {item.name}
+                </td>
+                <td className={td} style={{ color: "var(--faint)" }}>{item.vendorName || "—"}</td>
+                <td className={`${td} text-right mono`} style={{ color: "var(--faint)" }}>${item.cost.toFixed(2)}</td>
+                <td className={`${td} text-right mono font-medium`}>${item.price.toFixed(2)}</td>
+                <td className={`${td} text-center`}>
+                  {bulkMode ? (
+                    <input
+                      type="text"
+                      defaultValue={item.unit || ""}
+                      placeholder="ea"
+                      onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], unit: e.target.value } }))}
+                      className="text-center rounded border hairline focus-amber"
+                      style={{ width: "100%", padding: "0.3rem", backgroundColor: "var(--panel)" }}
+                    />
+                  ) : (
+                    <span style={{ color: "var(--faint)" }}>{item.unit || "—"}</span>
+                  )}
+                </td>
+                <td className={`${td} text-center`}>
+                  {bulkMode ? (
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      defaultValue={item.caseQty || 1}
+                      onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], caseQty: e.target.value } }))}
+                      className="text-center rounded border hairline focus-amber"
+                      style={{ width: "100%", padding: "0.3rem", backgroundColor: "var(--panel)" }}
+                    />
+                  ) : (
+                    <span className="mono" style={{ color: "var(--faint)" }}>{item.caseQty > 1 ? item.caseQty : "—"}</span>
+                  )}
+                </td>
+                <td className={`${td} text-center`}>
+                  {bulkMode ? (
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      defaultValue={item.stock}
+                      onChange={(e) => setDraft((d) => ({ ...d, [item.id]: { ...d[item.id], stock: e.target.value } }))}
+                      className="text-center rounded border hairline focus-amber"
+                      style={{ width: 70, padding: "0.3rem", backgroundColor: "var(--panel)" }}
+                    />
+                  ) : (
+                    <span className="mono" style={{ color: item.lowStockTitle ? "var(--rust)" : "var(--moss)" }}>
+                      {item.stock}
+                      {item.lowStockTitle && <span title={item.lowStockTitle}> ⚠</span>}
+                    </span>
+                  )}
+                </td>
+                <td className={`${td} text-center mono`} style={{ color: "var(--faint)" }}>{item.casesPlusEach || "—"}</td>
+                <td className={td}>
+                  {!bulkMode && (
+                    <div className="flex gap-3 justify-end">
+                      <Link href={`/items/${item.id}/edit`} className="text-xs font-semibold" style={{ color: "var(--deep)" }}>
+                        Edit
+                      </Link>
+                      <DeleteItemButton itemId={item.id} itemName={item.name} />
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {filteredItems.length === 0 && (
+              <tr>
+                <td className={`${td} text-center`} colSpan={10} style={{ color: "var(--faint)" }}>
+                  No items match your filters.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

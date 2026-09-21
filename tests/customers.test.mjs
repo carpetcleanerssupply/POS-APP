@@ -69,7 +69,7 @@ describe("customers", () => {
     });
     assert.equal(res.status, 303);
     const location = res.headers.get("location");
-    const id = location.match(/\/customers\/([^/]+)\/edit/)[1];
+    const id = location.match(/[?&]selected=([^&]+)/)[1];
 
     const customer = await prisma.customer.findUnique({ where: { id } });
     assert.equal(customer.shippingStreet, "123 Main St");

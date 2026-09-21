@@ -11,7 +11,7 @@ export default function DeleteItemButton({ itemId, itemName }) {
         }
       }}
     >
-      <button type="submit" className="btn btn-sm btn-danger">
+      <button type="submit" className="text-xs font-semibold" style={{ color: "var(--rust)", cursor: "pointer" }}>
         Delete
       </button>
     </form>
