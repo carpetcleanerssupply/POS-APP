@@ -7,6 +7,9 @@ function currency(n) {
   return `$${Number(n).toFixed(2)}`;
 }
 
+const inputClass = "px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
+
 export default function ReturnForm({ invoiceId, lines }) {
   const router = useRouter();
   const [qtys, setQtys] = useState({});
@@ -60,70 +63,71 @@ export default function ReturnForm({ invoiceId, lines }) {
   }
 
   return (
-    <form onSubmit={submit} style={{ maxWidth: 640, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form onSubmit={submit} className="card p-5 flex flex-col gap-4" style={{ maxWidth: 800 }}>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
 
       {lines.length === 0 ? (
-        <p style={{ color: "#777" }}>Nothing left on this invoice is eligible to return.</p>
+        <p className="text-sm" style={{ color: "var(--faint)" }}>Nothing left on this invoice is eligible to return.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className="w-full text-sm">
           <thead>
-            <tr style={{ fontSize: "0.8rem", textAlign: "left" }}>
-              <th>Item</th>
-              <th style={{ width: 90 }}>Max</th>
-              <th style={{ width: 90 }}>Return Qty</th>
-              <th style={{ width: 90, textAlign: "right" }}>Ext</th>
+            <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+              <th className="pb-2 font-medium">Item</th>
+              <th className="pb-2 font-medium" style={{ width: 90 }}>Max</th>
+              <th className="pb-2 font-medium" style={{ width: 90 }}>Return Qty</th>
+              <th className="pb-2 font-medium text-right" style={{ width: 90 }}>Ext</th>
             </tr>
           </thead>
           <tbody>
             {lines.map((l) => (
-              <tr key={l.itemId}>
-                <td>{l.name} ({l.sku})</td>
-                <td>{l.maxReturnable}</td>
-                <td>
+              <tr key={l.itemId} className="border-t hairline">
+                <td className="py-1.5">{l.name} ({l.sku})</td>
+                <td className="py-1.5">{l.maxReturnable}</td>
+                <td className="py-1.5">
                   <input
                     type="number"
                     min="0"
                     max={l.maxReturnable}
                     value={qtys[l.itemId] || 0}
                     onChange={(e) => setQty(l.itemId, e.target.value, l.maxReturnable)}
-                    style={{ width: 70, padding: "0.3rem" }}
+                    className="rounded border hairline focus-amber"
+                    style={{ ...inputStyle, width: 70, padding: "0.3rem" }}
                   />
                 </td>
-                <td style={{ textAlign: "right" }}>{currency((qtys[l.itemId] || 0) * l.unitPrice)}</td>
+                <td className="py-1.5 text-right mono">{currency((qtys[l.itemId] || 0) * l.unitPrice)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      <div style={{ fontWeight: 700 }}>Total: {currency(total)}</div>
+      <div className="text-right font-semibold text-lg mono" style={{ color: "var(--deep)" }}>Total: {currency(total)}</div>
 
-      <label>
-        Refund Method
-        <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} style={{ display: "block", padding: "0.5rem", marginTop: "0.25rem" }}>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Refund Method</div>
+        <select value={refundMethod} onChange={(e) => setRefundMethod(e.target.value)} className={inputClass} style={inputStyle}>
           <option value="ACCOUNT">Account Credit</option>
           <option value="CARD">Card</option>
           <option value="CHECK">Check</option>
           <option value="CASH">Cash</option>
         </select>
-      </label>
+      </div>
 
       {refundMethod === "CHECK" && (
-        <label>
-          Check Number
-          <input value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} style={{ display: "block", padding: "0.5rem", marginTop: "0.25rem" }} />
-        </label>
+        <div>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Check Number</div>
+          <input value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} className={inputClass} style={inputStyle} />
+        </div>
       )}
 
-      <label>
-        Reason
-        <input value={reason} onChange={(e) => setReason(e.target.value)} style={{ display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" }} />
-      </label>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Reason</div>
+        <input value={reason} onChange={(e) => setReason(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+      </div>
 
-      <button type="submit" className="btn btn-primary" disabled={busy || lines.length === 0}>
+      <button type="submit" disabled={busy || lines.length === 0} className="btn btn-primary">
         {busy ? "Saving..." : "Process Return"}
       </button>
     </form>
