@@ -23,7 +23,8 @@ export default function DeleteDraftButton({ invoiceId }) {
         }
         router.push("/invoices");
       }}
-      className="btn btn-sm btn-danger"
+      className="text-sm font-semibold"
+      style={{ color: "var(--rust)", cursor: "pointer" }}
     >
       {busy ? "Deleting..." : "Delete Draft"}
     </button>
