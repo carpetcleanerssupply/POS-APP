@@ -17,19 +17,24 @@ export default async function NewEstimatePage({ searchParams }) {
   if (!customerId) {
     const customers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-        <p><Link href="/estimates">&larr; Back to Estimates</Link></p>
-        <h1>New Estimate</h1>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="mb-3">
+          <Link href="/estimates" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Estimates</Link>
+        </p>
+        <div className="mb-5">
+          <div className="eyebrow mb-1">Estimates</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>New Estimate</h1>
+        </div>
         {customers.length === 0 ? (
-          <p>You need at least one customer first. <Link href="/customers/new">Add a customer</Link>.</p>
+          <p className="text-sm">You need at least one customer first. <Link href="/customers/new" className="underline" style={{ color: "var(--deep)" }}>Add a customer</Link>.</p>
         ) : (
-          <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
-            <select name="customerId" style={{ padding: "0.5rem", flex: 1 }}>
+          <form method="GET" className="card p-5 flex gap-3" style={{ maxWidth: 640 }}>
+            <select name="customerId" className="px-3 py-2 rounded border text-sm hairline" style={{ backgroundColor: "var(--panel)", flex: 1 }}>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>{displayName(c)}</option>
               ))}
             </select>
-            <button type="submit" className="btn btn-sm">Go</button>
+            <button type="submit" className="btn btn-primary">Go</button>
           </form>
         )}
       </main>
@@ -39,24 +44,31 @@ export default async function NewEstimatePage({ searchParams }) {
   const customer = await prisma.customer.findUnique({ where: { id: customerId } });
   if (!customer) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That customer no longer exists. <Link href="/estimates/new">Choose another</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
+          That customer no longer exists. <Link href="/estimates/new" className="underline" style={{ color: "var(--deep)" }}>Choose another</Link>.
+        </p>
       </main>
     );
   }
 
   if (plainItems.length === 0) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>You need at least one item first. <Link href="/items/new">Add an item</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">You need at least one item first. <Link href="/items/new" className="underline" style={{ color: "var(--deep)" }}>Add an item</Link>.</p>
       </main>
     );
   }
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><Link href="/estimates">&larr; Back to Estimates</Link></p>
-      <h1>New Estimate</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/estimates" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Estimates</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Estimates</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>New Estimate</h1>
+      </div>
       <EstimateForm items={plainItems} customer={{ id: customer.id, name: displayName(customer), taxExempt: customer.taxExempt }} />
     </main>
   );
