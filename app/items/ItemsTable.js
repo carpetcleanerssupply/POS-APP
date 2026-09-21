@@ -115,22 +115,20 @@ export default function ItemsTable({ items }) {
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
         <colgroup>
           <col style={{ width: "8%" }} />
-          <col style={{ width: "30%" }} />
-          <col style={{ width: "8%" }} />
-          <col style={{ width: "9%" }} />
+          <col style={{ width: "38%" }} />
+          <col style={{ width: "10%" }} />
           <col style={{ width: "5%" }} />
           <col style={{ width: "5%" }} />
           <col style={{ width: "6%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "6%" }} />
           <col style={{ width: "5%" }} />
-          <col style={{ width: "11%" }} />
+          <col style={{ width: "10%" }} />
         </colgroup>
         <thead>
           <tr>
             <th style={th}>SKU</th>
             <th style={th}>Name</th>
-            <th style={th}>Category</th>
             <th style={th}>Vendor</th>
             <th style={th}>Cost</th>
             <th style={th}>Price</th>
@@ -146,7 +144,6 @@ export default function ItemsTable({ items }) {
             <tr key={item.id} style={{ background: index % 2 === 1 ? "#f7f2e8" : "#fff" }}>
               <td style={td}>{item.sku}</td>
               <td style={{ ...td, whiteSpace: "normal", wordBreak: "break-word" }}>{item.name}</td>
-              <td style={td}>{item.category || "—"}</td>
               <td style={td}>{item.vendorName || "—"}</td>
               <td style={td}>${item.cost.toFixed(2)}</td>
               <td style={td}>${item.price.toFixed(2)}</td>
@@ -207,7 +204,7 @@ export default function ItemsTable({ items }) {
           ))}
           {filteredItems.length === 0 && (
             <tr>
-              <td style={td} colSpan={11}>No items match your filters.</td>
+              <td style={td} colSpan={10}>No items match your filters.</td>
             </tr>
           )}
         </tbody>
