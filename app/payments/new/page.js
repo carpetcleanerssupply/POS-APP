@@ -15,16 +15,21 @@ export default async function NewPaymentPage({ searchParams }) {
   if (!customerId) {
     const customers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-        <p><Link href="/payments">&larr; Back to Payments</Link></p>
-        <h1>Record a Payment</h1>
-        <form method="GET" style={{ display: "flex", gap: "0.75rem" }}>
-          <select name="customerId" style={{ padding: "0.5rem", flex: 1 }}>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="mb-3">
+          <Link href="/payments" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Payments</Link>
+        </p>
+        <div className="mb-5">
+          <div className="eyebrow mb-1">Accounts Receivable</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Record a Payment</h1>
+        </div>
+        <form method="GET" className="card p-5 flex gap-3" style={{ maxWidth: 640 }}>
+          <select name="customerId" className="px-3 py-2 rounded border text-sm hairline" style={{ backgroundColor: "var(--panel)", flex: 1 }}>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>{displayName(c)}</option>
             ))}
           </select>
-          <button type="submit" className="btn btn-sm">Go</button>
+          <button type="submit" className="btn btn-primary">Go</button>
         </form>
       </main>
     );
@@ -33,8 +38,10 @@ export default async function NewPaymentPage({ searchParams }) {
   const customer = await prisma.customer.findUnique({ where: { id: customerId } });
   if (!customer) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That customer no longer exists. <Link href="/payments/new">Choose another</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
+          That customer no longer exists. <Link href="/payments/new" className="underline" style={{ color: "var(--deep)" }}>Choose another</Link>.
+        </p>
       </main>
     );
   }
@@ -58,9 +65,14 @@ export default async function NewPaymentPage({ searchParams }) {
   const creditAvailable = creditSources.reduce((sum, s) => sum + s.remaining, 0);
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 680 }}>
-      <p><Link href="/payments">&larr; Back to Payments</Link></p>
-      <h1>Record a Payment — {displayName(customer)}</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/payments" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Payments</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Accounts Receivable</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Record a Payment — {displayName(customer)}</h1>
+      </div>
       <PaymentForm
         customer={{ id: customer.id, balance: Number(customer.balance) }}
         openInvoices={openInvoices}
