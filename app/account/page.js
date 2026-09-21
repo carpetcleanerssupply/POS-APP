@@ -6,16 +6,23 @@ export default async function AccountPage() {
   const session = await requireSession();
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 480 }}>
-      <p><Link href="/">&larr; Home</Link></p>
-      <h1>My Account</h1>
-      <p style={{ color: "#555" }}>
-        Signed in as <strong>{session.user.name}</strong> ({session.user.username}) —{" "}
-        {session.user.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"}
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Home</Link>
       </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Account</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>My Account</h1>
+        <p className="text-sm mt-2" style={{ color: "var(--faint)" }}>
+          Signed in as <strong style={{ color: "var(--ink)" }}>{session.user.name}</strong> ({session.user.username}) —{" "}
+          {session.user.tier === "OWNER_MANAGER" ? "Owner/Manager" : "Staff"}
+        </p>
+      </div>
 
-      <h3 style={{ marginTop: "1.5rem" }}>Change Password</h3>
-      <ChangePasswordForm />
+      <div className="card p-5" style={{ maxWidth: 400 }}>
+        <div className="eyebrow mb-3">Change Password</div>
+        <ChangePasswordForm />
+      </div>
     </main>
   );
 }

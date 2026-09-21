@@ -38,12 +38,12 @@ export default function ImportCsvForm({ action, noun = "row" }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "0.75rem", maxWidth: 480 }}>
+    <form onSubmit={handleSubmit} className="card p-5 flex flex-col gap-3" style={{ maxWidth: 480 }}>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
       {result && (
-        <p style={{ color: "#2e7d32", background: "#e8f5e9", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--moss)", backgroundColor: "var(--moss-bg)" }}>
           Imported: {result.created} new {noun}
           {result.created === 1 ? "" : "s"}, {result.updated} updated.
           {result.errors.length > 0 && (
@@ -54,8 +54,8 @@ export default function ImportCsvForm({ action, noun = "row" }) {
           )}
         </p>
       )}
-      <input type="file" accept=".csv" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-      <button type="submit" className="btn btn-primary" disabled={busy} style={{ alignSelf: "flex-start" }}>
+      <input type="file" accept=".csv" onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-sm" />
+      <button type="submit" disabled={busy} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {busy ? "Importing..." : "Import"}
       </button>
     </form>

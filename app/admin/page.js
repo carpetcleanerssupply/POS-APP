@@ -7,26 +7,31 @@ export default async function AdminPage() {
   const session = await requireSession();
   if (!isOwnerManager(session)) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>Admin Tools are only available to Owner/Manager logins.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">Admin Tools are only available to Owner/Manager logins.</p>
       </main>
     );
   }
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 600 }}>
-      <p><Link href="/">&larr; Home</Link></p>
-      <h1>Admin Tools</h1>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", margin: "1.5rem 0" }}>
-        <Link href="/reports/sales">Sales Report</Link>
-        <Link href="/reports/ar-aging">A/R Aging</Link>
-        <Link href="/reports/inventory-valuation">Inventory Valuation</Link>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Home</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Admin</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Admin Tools</h1>
       </div>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <h3 style={{ marginTop: 0 }}>Recalculate Balances</h3>
-        <p style={{ color: "#777", fontSize: "0.9rem" }}>
+      <div className="flex flex-col gap-2 mb-5" style={{ maxWidth: 400 }}>
+        <Link href="/reports/sales" className="text-sm font-semibold" style={{ color: "var(--deep)" }}>Sales Report</Link>
+        <Link href="/reports/ar-aging" className="text-sm font-semibold" style={{ color: "var(--deep)" }}>A/R Aging</Link>
+        <Link href="/reports/inventory-valuation" className="text-sm font-semibold" style={{ color: "var(--deep)" }}>Inventory Valuation</Link>
+      </div>
+
+      <div className="card p-5" style={{ maxWidth: 480 }}>
+        <div className="eyebrow mb-2">Recalculate Balances</div>
+        <p className="text-sm mb-3" style={{ color: "var(--faint)" }}>
           Rebuilds every customer&apos;s balance and every invoice&apos;s paid amount from the full transaction history.
           Use this if something looks off, not as a routine action.
         </p>

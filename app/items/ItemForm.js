@@ -8,9 +8,8 @@ const ERROR_MESSAGES = {
   duplicate_sku: "That SKU is already in use — SKUs must be unique.",
 };
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
-const rowStyle = { display: "flex", gap: "1rem" };
-const labelStyle = { flex: 1, fontSize: "0.9rem" };
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
 
 function currency(n) {
   return `$${Number(n || 0).toFixed(2)}`;
@@ -35,77 +34,79 @@ export default function ItemForm({ action, item, error, submitLabel, showMargin 
   }
 
   return (
-    <div style={{ maxWidth: 560 }}>
+    <div className="card p-5" style={{ maxWidth: 640 }}>
       {error && ERROR_MESSAGES[error] && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>
           {ERROR_MESSAGES[error]}
         </p>
       )}
 
-      <form action={action} method="POST" style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            SKU *
-            <input name="sku" defaultValue={v("sku")} required style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Item Name *
-            <input name="name" defaultValue={v("name")} required style={fieldStyle} />
-          </label>
+      <form action={action} method="POST" className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>SKU *</div>
+            <input name="sku" defaultValue={v("sku")} required className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Item Name *</div>
+            <input name="name" defaultValue={v("name")} required className={inputClass} style={inputStyle} />
+          </div>
         </div>
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Category
-            <input name="category" defaultValue={v("category")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Vendor
-            <input name="vendorName" defaultValue={v("vendorName")} style={fieldStyle} />
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Category</div>
+            <input name="category" defaultValue={v("category")} className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Vendor</div>
+            <input name="vendorName" defaultValue={v("vendorName")} className={inputClass} style={inputStyle} />
+          </div>
         </div>
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Cost
-            <input name="cost" type="number" step="0.01" min="0" value={cost} onChange={(e) => setCost(e.target.value)} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Price
-            <input name="price" type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} style={fieldStyle} />
-            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.4rem" }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Cost</div>
+            <input name="cost" type="number" step="0.01" min="0" value={cost} onChange={(e) => setCost(e.target.value)} className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Price</div>
+            <input name="price" type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} className={inputClass} style={inputStyle} />
+            <div className="flex items-center gap-2 mt-2">
               <input
                 type="number"
                 placeholder="%"
                 value={priceBumpPct}
                 onChange={(e) => setPriceBumpPct(e.target.value)}
-                style={{ width: 60, padding: "0.3rem", fontSize: "0.8rem" }}
+                className="rounded border hairline focus-amber text-xs"
+                style={{ ...inputStyle, width: 60, padding: "0.3rem" }}
               />
               <button
                 type="button"
                 onClick={bumpPrice}
-                style={{ fontSize: "0.75rem", padding: "0.3rem 0.5rem", cursor: "pointer", whiteSpace: "nowrap" }}
+                className="text-xs font-semibold whitespace-nowrap"
+                style={{ color: "var(--deep)", cursor: "pointer" }}
               >
                 Increase price by %
               </button>
             </div>
-          </label>
+          </div>
         </div>
 
         {showMargin && (
-          <div style={{ fontSize: "0.85rem", color: profit >= 0 ? "#2e7d32" : "#c62828" }}>
+          <div className="text-sm" style={{ color: profit >= 0 ? "var(--moss)" : "var(--rust)" }}>
             Profit: {currency(profit)}
-            {margin != null && <span style={{ color: "#777" }}> ({margin.toFixed(1)}% margin)</span>}
+            {margin != null && <span style={{ color: "var(--faint)" }}> ({margin.toFixed(1)}% margin)</span>}
           </div>
         )}
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Stock on Hand
-            <input name="stock" type="number" step="1" min="0" defaultValue={v("stock", 0)} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Low Stock Alert Below
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Stock on Hand</div>
+            <input name="stock" type="number" step="1" min="0" defaultValue={v("stock", 0)} className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Low Stock Alert Below</div>
             <input
               name="lowStockThreshold"
               type="number"
@@ -113,40 +114,37 @@ export default function ItemForm({ action, item, error, submitLabel, showMargin 
               min="0"
               placeholder="default (5, or 8 for chemicals sold by the gallon)"
               defaultValue={item?.lowStockThreshold ?? ""}
-              style={fieldStyle}
+              className={inputClass}
+              style={inputStyle}
             />
-          </label>
+          </div>
         </div>
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Unit
-            <input name="unit" defaultValue={v("unit")} placeholder="ea" style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Units / Case
-            <input name="caseQty" type="number" step="1" min="1" defaultValue={v("caseQty", 1)} style={fieldStyle} />
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Unit</div>
+            <input name="unit" defaultValue={v("unit")} placeholder="ea" className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Units / Case</div>
+            <input name="caseQty" type="number" step="1" min="1" defaultValue={v("caseQty", 1)} className={inputClass} style={inputStyle} />
+          </div>
         </div>
 
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            COGS Account
-            <input name="cogsAccount" defaultValue={v("cogsAccount", "Cost of Goods Sold")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Income Account
-            <input name="incomeAccount" defaultValue={v("incomeAccount", "Uncategorized")} style={fieldStyle} />
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>COGS Account</div>
+            <input name="cogsAccount" defaultValue={v("cogsAccount", "Cost of Goods Sold")} className={inputClass} style={inputStyle} />
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Income Account</div>
+            <input name="incomeAccount" defaultValue={v("incomeAccount", "Uncategorized")} className={inputClass} style={inputStyle} />
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          <button type="submit" className="btn btn-primary">
-            {submitLabel}
-          </button>
-          <Link href="/items" className="btn">
-            Cancel
-          </Link>
+        <div className="flex gap-3 pt-2">
+          <button type="submit" className="btn btn-primary">{submitLabel}</button>
+          <Link href="/items" className="btn">Cancel</Link>
         </div>
       </form>
     </div>
