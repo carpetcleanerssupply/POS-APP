@@ -19,8 +19,11 @@ export default async function NewInvoicePage({ searchParams }) {
 
   if (estimateId && (!estimate || estimate.status !== "OPEN")) {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>That estimate isn&apos;t available to convert. <Link href="/invoices/new">Start a blank invoice</Link>.</p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
+          That estimate isn&apos;t available to convert.{" "}
+          <Link href="/invoices/new" className="underline" style={{ color: "var(--deep)" }}>Start a blank invoice</Link>.
+        </p>
       </main>
     );
   }
@@ -41,18 +44,23 @@ export default async function NewInvoicePage({ searchParams }) {
   }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><Link href="/invoices">&larr; Back to Invoices</Link></p>
-      <h1>New Invoice</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/invoices" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Invoices</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Counter Sale</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>New Invoice</h1>
+      </div>
       {plainCustomers.length === 0 ? (
-        <p>
+        <p className="text-sm">
           You need at least one customer before creating an invoice.{" "}
-          <Link href="/customers/new">Add a customer</Link> first.
+          <Link href="/customers/new" className="underline" style={{ color: "var(--deep)" }}>Add a customer</Link> first.
         </p>
       ) : plainItems.length === 0 ? (
-        <p>
+        <p className="text-sm">
           You need at least one item before creating an invoice.{" "}
-          <Link href="/items/new">Add an item</Link> first.
+          <Link href="/items/new" className="underline" style={{ color: "var(--deep)" }}>Add an item</Link> first.
         </p>
       ) : (
         <NewInvoiceForm

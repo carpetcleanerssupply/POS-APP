@@ -5,12 +5,32 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TAX_RATE, lineExt } from "@/lib/invoices";
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
-const rowStyle = { display: "flex", gap: "1rem" };
-const labelStyle = { flex: 1, fontSize: "0.9rem" };
+const inputClass = "px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
 
 function currency(n) {
   return `$${Number(n).toFixed(2)}`;
+}
+
+function Segmented({ value, onChange, options }) {
+  return (
+    <div className="flex rounded overflow-hidden border hairline" style={{ width: "fit-content" }}>
+      {options.map(([val, label]) => (
+        <button
+          key={val}
+          type="button"
+          onClick={() => onChange(val)}
+          className="px-3 py-2 text-sm font-semibold"
+          style={{
+            backgroundColor: value === val ? "var(--deep)" : "var(--panel)",
+            color: value === val ? "#fff" : "var(--ink)",
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export default function NewInvoiceForm({
@@ -163,20 +183,20 @@ export default function NewInvoiceForm({
   const depositTooBig = settledTo === "ACCOUNT" && Number(depositAmount) > total + 0.005;
 
   return (
-    <div style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="flex flex-col gap-4" style={{ maxWidth: 900 }}>
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
 
       {estimateId && (
-        <p style={{ background: "#fff3e0", color: "#e65100", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ backgroundColor: "#FBF0DA", color: "var(--amber-dark)" }}>
           Converting from estimate — line items were prefilled below. Choose payment to close this invoice.
         </p>
       )}
 
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Customer *
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex-1" style={{ minWidth: 260 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Customer *</div>
           <select
             value={customerId}
             onChange={(e) => {
@@ -184,7 +204,8 @@ export default function NewInvoiceForm({
               const c = customers.find((cust) => cust.id === e.target.value);
               if (c?.isWalkIn) setSettledTo("PAID_NOW");
             }}
-            style={fieldStyle}
+            className={inputClass}
+            style={{ ...inputStyle, width: "100%" }}
           >
             <option value="">Select a customer...</option>
             {customers.map((c) => (
@@ -194,18 +215,12 @@ export default function NewInvoiceForm({
               </option>
             ))}
           </select>
-        </label>
-        <label style={labelStyle}>
-          Sale Type
-          <select value={saleType} onChange={(e) => setSaleType(e.target.value)} style={fieldStyle}>
-            <option value="WALKIN">Walk-in</option>
-            <option value="PHONE">Phone</option>
-          </select>
-        </label>
+        </div>
+        <Segmented value={saleType} onChange={setSaleType} options={[["WALKIN", "Walk-in"], ["PHONE", "Phone order"]]} />
       </div>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+      <div className="rounded-lg p-4" style={{ backgroundColor: "var(--paper)", border: "1px solid var(--line)" }}>
+        <div className="flex gap-2 mb-3">
           <input
             value={pickerSku}
             onChange={(e) => setPickerSku(e.target.value)}
@@ -217,64 +232,63 @@ export default function NewInvoiceForm({
             }}
             list="item-options"
             placeholder="Enter SKU or item name, then Add"
-            style={{ ...fieldStyle, marginTop: 0, flex: 1 }}
+            className={inputClass}
+            style={{ ...inputStyle, flex: 1 }}
           />
           <datalist id="item-options">
             {items.map((i) => (
               <option key={i.id} value={i.sku}>{`${i.sku} — ${i.name}`}</option>
             ))}
           </datalist>
-          <button type="button" className="btn btn-sm" onClick={addLine}>
-            Add
-          </button>
+          <button type="button" onClick={addLine} className="btn btn-sm">Add</button>
         </div>
 
         {lineRows.length === 0 ? (
-          <p style={{ color: "#777" }}>No line items yet.</p>
+          <p className="text-sm" style={{ color: "var(--faint)" }}>No items on this invoice yet.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table className="w-full text-sm">
             <thead>
-              <tr style={{ fontSize: "0.8rem", textAlign: "left" }}>
-                <th>Item</th>
-                <th style={{ width: 70 }}>Qty</th>
-                <th style={{ width: 80 }}>Disc %</th>
-                <th style={{ width: 90, textAlign: "right" }}>Ext</th>
-                <th style={{ width: 30 }}></th>
+              <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+                <th className="pb-2 font-medium">Item</th>
+                <th className="pb-2 font-medium" style={{ width: 70 }}>Qty</th>
+                <th className="pb-2 font-medium" style={{ width: 80 }}>Disc %</th>
+                <th className="pb-2 font-medium text-right" style={{ width: 90 }}>Ext</th>
+                <th className="pb-2" style={{ width: 30 }}></th>
               </tr>
             </thead>
             <tbody>
               {lineRows.map((r) => (
-                <tr key={r.itemId}>
-                  <td>
+                <tr key={r.itemId} className="border-t hairline">
+                  <td className="py-1.5">
                     {r.item ? `${r.item.name} (${r.item.sku})` : "Unknown item"}
                     {r.item && Number(r.qty) > r.item.stock && (
-                      <div style={{ color: "#c62828", fontSize: "0.8rem" }}>
-                        Only {r.item.stock} in stock
-                      </div>
+                      <div className="text-xs" style={{ color: "var(--rust)" }}>Only {r.item.stock} in stock</div>
                     )}
                   </td>
-                  <td>
+                  <td className="py-1.5">
                     <input
                       type="number"
                       min="1"
                       value={r.qty}
                       onChange={(e) => updateLine(r.itemId, { qty: e.target.value })}
-                      style={{ width: 60, padding: "0.3rem" }}
+                      className="rounded border hairline focus-amber"
+                      style={{ ...inputStyle, width: 60, padding: "0.3rem" }}
                     />
                   </td>
-                  <td>
+                  <td className="py-1.5">
                     <input
                       type="number"
                       min="0"
                       max="100"
                       value={r.discountPct}
                       onChange={(e) => updateLine(r.itemId, { discountPct: e.target.value })}
-                      style={{ width: 70, padding: "0.3rem" }}
+                      className="rounded border hairline focus-amber"
+                      style={{ ...inputStyle, width: 70, padding: "0.3rem" }}
                     />
                   </td>
-                  <td style={{ textAlign: "right" }}>{currency(r.ext)}</td>
-                  <td>
-                    <button type="button" onClick={() => removeLine(r.itemId)} style={{ color: "#c62828", cursor: "pointer" }}>
+                  <td className="py-1.5 text-right mono">{currency(r.ext)}</td>
+                  <td className="py-1.5">
+                    <button type="button" onClick={() => removeLine(r.itemId)} style={{ color: "var(--rust)", cursor: "pointer" }}>
                       ✕
                     </button>
                   </td>
@@ -285,94 +299,104 @@ export default function NewInvoiceForm({
         )}
       </div>
 
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Customer PO
-          <input value={customerPO} onChange={(e) => setCustomerPO(e.target.value)} style={fieldStyle} />
-        </label>
-        <label style={labelStyle}>
-          Ship Via
-          <input value={shipVia} onChange={(e) => setShipVia(e.target.value)} style={fieldStyle} />
-        </label>
-        <label style={labelStyle}>
-          Tracking #
-          <input value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} style={fieldStyle} />
-        </label>
+      <div className="flex gap-4 flex-wrap">
+        <div className="flex-1" style={{ minWidth: 180 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Customer PO</div>
+          <input value={customerPO} onChange={(e) => setCustomerPO(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+        </div>
+        <div className="flex-1" style={{ minWidth: 180 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Ship Via</div>
+          <input value={shipVia} onChange={(e) => setShipVia(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+        </div>
+        <div className="flex-1" style={{ minWidth: 180 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Tracking #</div>
+          <input value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} className={inputClass} style={{ ...inputStyle, width: "100%" }} />
+        </div>
       </div>
 
-      <label>
-        Notes
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} style={{ ...fieldStyle, minHeight: 60 }} />
-      </label>
-
-      <div style={rowStyle}>
-        <label style={labelStyle}>
-          Shipping Charge
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={shippingCharge}
-            onChange={(e) => setShippingCharge(e.target.value)}
-            style={fieldStyle}
-          />
-        </label>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Notes</div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder='e.g. "Customer requested unscented formula" or "Leave at side door"'
+          className={inputClass}
+          style={{ ...inputStyle, width: "100%", minHeight: 60 }}
+        />
       </div>
 
-      <div style={{ textAlign: "right", fontSize: "0.95rem" }}>
-        <div>Subtotal: {currency(subtotal)}</div>
-        {TAX_RATE > 0 && <div>Tax: {currency(tax)}</div>}
-        <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: {currency(total)}</div>
+      <div className="flex justify-between items-start flex-wrap gap-4">
+        <div style={{ minWidth: 180 }}>
+          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Shipping Charge</div>
+          <div className="flex items-center gap-1">
+            <span style={{ color: "var(--faint)" }}>$</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={shippingCharge}
+              onChange={(e) => setShippingCharge(e.target.value)}
+              className={inputClass}
+              style={{ ...inputStyle, width: 120 }}
+            />
+          </div>
+        </div>
+        <div className="text-right text-sm">
+          <div style={{ color: "var(--faint)" }}>Subtotal: {currency(subtotal)}</div>
+          {TAX_RATE > 0 && <div style={{ color: "var(--faint)" }}>Tax: {currency(tax)}</div>}
+          <div className="font-semibold text-lg mono mt-1" style={{ color: "var(--deep)" }}>Total: {currency(total)}</div>
+        </div>
       </div>
 
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: "1rem" }}>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Settle As
+      <div className="card p-4">
+        <div className="flex gap-4 flex-wrap items-end">
+          <div>
+            <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Settle As</div>
             <select
               value={settledTo}
               onChange={(e) => setSettledTo(e.target.value)}
               disabled={isWalkInCustomer}
-              style={fieldStyle}
+              className={inputClass}
+              style={inputStyle}
             >
               <option value="PAID_NOW">Paid Now</option>
               <option value="ACCOUNT">Charge to Account</option>
             </select>
             {isWalkInCustomer && (
-              <span style={{ fontSize: "0.8rem", color: "#777" }}>Walk-in customers must be paid now.</span>
+              <div className="text-xs mt-1" style={{ color: "var(--faint)" }}>Walk-in customers must be paid now.</div>
             )}
-          </label>
+          </div>
 
           {settledTo === "ACCOUNT" && (
-            <label style={labelStyle}>
-              Due Date
-              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} style={fieldStyle} />
-            </label>
+            <div>
+              <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Due Date</div>
+              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} style={inputStyle} />
+            </div>
           )}
 
           {settledTo === "PAID_NOW" && (
-            <label style={labelStyle}>
-              Payment Method
-              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={fieldStyle}>
+            <div>
+              <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Payment Method</div>
+              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className={inputClass} style={inputStyle}>
                 <option value="CARD">Card</option>
                 <option value="CHECK">Check</option>
                 <option value="CASH">Cash</option>
               </select>
-            </label>
+            </div>
           )}
 
           {settledTo === "PAID_NOW" && paymentMethod === "CHECK" && (
-            <label style={labelStyle}>
-              Check Number
-              <input value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} style={fieldStyle} />
-            </label>
+            <div>
+              <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Check Number</div>
+              <input value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} className={inputClass} style={inputStyle} />
+            </div>
           )}
         </div>
 
         {settledTo === "ACCOUNT" && (
-          <div style={{ ...rowStyle, marginTop: "0.75rem", paddingTop: "0.75rem", borderTop: "1px solid #eee" }}>
-            <label style={labelStyle}>
-              Deposit Now (optional)
+          <div className="flex gap-4 flex-wrap items-end mt-3 pt-3 border-t hairline">
+            <div>
+              <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Deposit Now (optional)</div>
               <input
                 type="number"
                 min="0"
@@ -380,27 +404,28 @@ export default function NewInvoiceForm({
                 placeholder="0.00"
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
-                style={fieldStyle}
+                className={inputClass}
+                style={inputStyle}
               />
               {depositTooBig && (
-                <span style={{ fontSize: "0.8rem", color: "#c62828" }}>Can&apos;t exceed the total.</span>
+                <div className="text-xs mt-1" style={{ color: "var(--rust)" }}>Can&apos;t exceed the total.</div>
               )}
-            </label>
+            </div>
             {Number(depositAmount) > 0 && (
               <>
-                <label style={labelStyle}>
-                  Deposit Method
-                  <select value={depositMethod} onChange={(e) => setDepositMethod(e.target.value)} style={fieldStyle}>
+                <div>
+                  <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Deposit Method</div>
+                  <select value={depositMethod} onChange={(e) => setDepositMethod(e.target.value)} className={inputClass} style={inputStyle}>
                     <option value="CARD">Card</option>
                     <option value="CHECK">Check</option>
                     <option value="CASH">Cash</option>
                   </select>
-                </label>
+                </div>
                 {depositMethod === "CHECK" && (
-                  <label style={labelStyle}>
-                    Deposit Check #
-                    <input value={depositCheckNumber} onChange={(e) => setDepositCheckNumber(e.target.value)} style={fieldStyle} />
-                  </label>
+                  <div>
+                    <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Deposit Check #</div>
+                    <input value={depositCheckNumber} onChange={(e) => setDepositCheckNumber(e.target.value)} className={inputClass} style={inputStyle} />
+                  </div>
                 )}
               </>
             )}
@@ -408,16 +433,18 @@ export default function NewInvoiceForm({
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="button" className="btn btn-primary" onClick={closeInvoice} disabled={!!submitting || depositTooBig}>
-          {submitting === "close" ? "Saving..." : "Close Invoice"}
+      <div className="flex gap-3">
+        <button type="button" onClick={saveDraft} disabled={!!submitting} className="btn">
+          {submitting === "draft" ? "Saving..." : "Save Draft"}
         </button>
-        <button type="button" className="btn" onClick={saveDraft} disabled={!!submitting}>
-          {submitting === "draft" ? "Saving..." : "Save as Draft"}
+        <button type="button" onClick={closeInvoice} disabled={!!submitting || depositTooBig} className="btn btn-primary flex-1">
+          {submitting === "close" ? "Saving..." : `Save & Close — ${currency(total)}`}
         </button>
-        <Link href="/invoices" className="btn">
-          Cancel
-        </Link>
+        <Link href="/invoices" className="btn" style={{ color: "var(--rust)" }}>Cancel</Link>
+      </div>
+      <div className="text-xs" style={{ color: "var(--faint)" }}>
+        <strong>Save Draft</strong> holds this for later editing — inventory and balances aren&apos;t touched yet.{" "}
+        <strong>Save &amp; Close</strong> finalizes it: stock and account balances update, and it can&apos;t be edited afterward.
       </div>
     </div>
   );

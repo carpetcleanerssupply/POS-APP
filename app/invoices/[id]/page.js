@@ -11,9 +11,6 @@ import DeleteDraftButton from "../DeleteDraftButton";
 import PrintButton from "../../PrintButton";
 import EmailButton from "../../EmailButton";
 
-const td = { padding: "0.4rem 0.6rem", borderBottom: "1px solid #eee" };
-const th = { textAlign: "left", padding: "0.4rem 0.6rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-
 export default async function InvoiceDetailPage({ params }) {
   await requireSession();
   const { id } = await params;
@@ -60,21 +57,20 @@ export default async function InvoiceDetailPage({ params }) {
   });
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 760 }}>
-      <p className="no-print"><Link href="/invoices">&larr; Back to Invoices</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="no-print mb-3">
+        <Link href="/invoices" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Invoices</Link>
+      </p>
 
       <DocumentLetterhead />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h1>Invoice #{invoice.number}</h1>
+      <div className="flex justify-between items-baseline mt-4">
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Invoice #{invoice.number}</h1>
         <span
+          className="px-3 py-1 rounded-md font-semibold text-xs"
           style={{
-            padding: "0.3rem 0.7rem",
-            borderRadius: 6,
-            background: isDraft ? "#eee" : isAccount ? "#fff3e0" : "#e8f5e9",
-            color: isDraft ? "#555" : isAccount ? "#e65100" : "#2e7d32",
-            fontWeight: 600,
-            fontSize: "0.85rem",
+            backgroundColor: isDraft ? "var(--paper)" : isAccount ? "#FBF0DA" : "var(--moss-bg)",
+            color: isDraft ? "var(--faint)" : isAccount ? "var(--amber-dark)" : "var(--moss)",
           }}
         >
           {isDraft ? "Draft" : isAccount ? "Charged to Account" : "Paid"}
@@ -82,77 +78,91 @@ export default async function InvoiceDetailPage({ params }) {
       </div>
 
       {isDraft && (
-        <p style={{ background: "#fff3e0", color: "#e65100", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="px-4 py-3 rounded-lg text-sm mt-3" style={{ backgroundColor: "#FBF0DA", color: "var(--amber-dark)" }}>
           This is a draft — nothing has been charged and stock hasn&apos;t been affected yet.
         </p>
       )}
 
-      <p style={{ color: "#555" }}>
+      <p className="text-sm mt-2" style={{ color: "var(--faint)" }}>
         {new Date(invoice.date).toLocaleString()} &middot; {invoice.saleType === "WALKIN" ? "Walk-in" : "Phone"} sale
         &middot; sold by {invoice.employee?.name || "—"}
       </p>
 
-      <h3>{invoice.customerName}</h3>
-      {invoice.customer && <p className="no-print" style={{ color: "#555" }}><Link href={`/customers/${invoice.customer.id}/edit`}>View customer</Link></p>}
+      <h3 className="text-base font-semibold mt-3" style={{ color: "var(--ink)" }}>{invoice.customerName}</h3>
+      {invoice.customer && (
+        <p className="no-print text-sm mt-1">
+          <Link href={`/customers?selected=${invoice.customer.id}`} className="underline" style={{ color: "var(--deep)" }}>View customer</Link>
+        </p>
+      )}
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
-        <thead>
-          <tr>
-            <th style={th}>SKU</th>
-            <th style={th}>Item</th>
-            <th style={th}>Qty</th>
-            <th style={th}>Price</th>
-            <th style={th}>Disc</th>
-            <th style={{ ...th, textAlign: "right" }}>Ext</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoice.lines.map((l) => (
-            <tr key={l.id}>
-              <td style={td}>{l.sku}</td>
-              <td style={td}>{l.name}</td>
-              <td style={td}>{l.qty}</td>
-              <td style={td}>${Number(l.price).toFixed(2)}</td>
-              <td style={td}>{Number(l.discountPct) > 0 ? `${l.discountPct}%` : "—"}</td>
-              <td style={{ ...td, textAlign: "right" }}>${Number(l.ext).toFixed(2)}</td>
+      <div className="card overflow-hidden mt-4">
+        <table className="w-full text-sm">
+          <thead>
+            <tr style={{ backgroundColor: "var(--paper)" }}>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>SKU</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Item</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Qty</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Price</th>
+              <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Disc</th>
+              <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Ext</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {invoice.lines.map((l) => (
+              <tr key={l.id}>
+                <td className="px-3 py-2 border-t hairline mono" style={{ color: "var(--faint)" }}>{l.sku}</td>
+                <td className="px-3 py-2 border-t hairline">{l.name}</td>
+                <td className="px-3 py-2 border-t hairline">{l.qty}</td>
+                <td className="px-3 py-2 border-t hairline mono">${Number(l.price).toFixed(2)}</td>
+                <td className="px-3 py-2 border-t hairline">{Number(l.discountPct) > 0 ? `${l.discountPct}%` : "—"}</td>
+                <td className="px-3 py-2 border-t hairline text-right mono font-medium">${Number(l.ext).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div style={{ textAlign: "right", marginTop: "1rem" }}>
-        <div>Subtotal: ${Number(invoice.subtotal).toFixed(2)}</div>
-        {Number(invoice.shippingCharge) > 0 && <div>Shipping: ${Number(invoice.shippingCharge).toFixed(2)}</div>}
-        {Number(invoice.tax) > 0 && <div>Tax: ${Number(invoice.tax).toFixed(2)}</div>}
-        <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>Total: ${Number(invoice.total).toFixed(2)}</div>
+      <div className="text-right mt-3 text-sm">
+        <div style={{ color: "var(--faint)" }}>Subtotal: ${Number(invoice.subtotal).toFixed(2)}</div>
+        {Number(invoice.shippingCharge) > 0 && <div style={{ color: "var(--faint)" }}>Shipping: ${Number(invoice.shippingCharge).toFixed(2)}</div>}
+        {Number(invoice.tax) > 0 && <div style={{ color: "var(--faint)" }}>Tax: ${Number(invoice.tax).toFixed(2)}</div>}
+        <div className="font-semibold text-lg mono mt-1" style={{ color: "var(--deep)" }}>Total: ${Number(invoice.total).toFixed(2)}</div>
       </div>
 
       {!isDraft && (
-        <p style={{ marginTop: "1rem", color: "#555" }}>
+        <p className="text-sm mt-4" style={{ color: "var(--faint)" }}>
           {isAccount
             ? "Charged to customer account."
             : `Paid via ${invoice.paymentMethod?.toLowerCase()}${invoice.checkNumber ? ` (check #${invoice.checkNumber})` : ""}.`}
         </p>
       )}
 
-      <p className="no-print" style={{ display: "flex", gap: "1rem" }}>
+      <p className="no-print flex gap-4 mt-5 items-center flex-wrap">
         <PrintButton />
         <EmailButton mailtoUrl={emailMailto} />
         {isDraft ? (
           <>
-            <Link href={`/invoices/${invoice.id}/edit`}>Edit / Close Draft</Link>
+            <Link href={`/invoices/${invoice.id}/edit`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+              Edit / Close Draft
+            </Link>
             <DeleteDraftButton invoiceId={invoice.id} />
           </>
         ) : (
           <>
-            <Link href={`/returns/new?invoiceId=${invoice.id}`}>Process Return</Link>
-            {isAccount && <Link href={`/payments/new?customerId=${invoice.customerId}`}>Record Payment</Link>}
+            <Link href={`/returns/new?invoiceId=${invoice.id}`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+              Process Return
+            </Link>
+            {isAccount && (
+              <Link href={`/payments/new?customerId=${invoice.customerId}`} className="text-sm font-semibold" style={{ color: "var(--deep)" }}>
+                Record Payment
+              </Link>
+            )}
           </>
         )}
       </p>
 
       {invoice.notes && (
-        <p style={{ marginTop: "1rem" }}>
+        <p className="text-sm mt-4">
           <strong>Notes:</strong> {invoice.notes}
         </p>
       )}

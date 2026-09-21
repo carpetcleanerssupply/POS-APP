@@ -16,10 +16,10 @@ export default async function EditInvoiceDraftPage({ params }) {
 
   if (invoice.status !== "DRAFT") {
     return (
-      <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem" }}>
-        <p>
+      <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+        <p className="text-sm">
           This invoice is already closed and can&apos;t be edited.{" "}
-          <Link href={`/invoices/${id}`}>View it</Link>.
+          <Link href={`/invoices/${id}`} className="underline" style={{ color: "var(--deep)" }}>View it</Link>.
         </p>
       </main>
     );
@@ -40,9 +40,14 @@ export default async function EditInvoiceDraftPage({ params }) {
   }));
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p><Link href="/invoices">&larr; Back to Invoices</Link></p>
-      <h1>Draft Invoice #{invoice.number}</h1>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/invoices" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Invoices</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Counter Sale</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Draft Invoice #{invoice.number}</h1>
+      </div>
       <NewInvoiceForm
         items={plainItems}
         customers={plainCustomers}
