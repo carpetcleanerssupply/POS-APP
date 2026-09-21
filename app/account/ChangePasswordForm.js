@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline";
+const inputStyle = { backgroundColor: "var(--panel)" };
 
 export default function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -45,28 +46,29 @@ export default function ChangePasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 360, display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {error && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>{error}</p>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>{error}</p>
       )}
       {success && (
-        <p style={{ color: "#2e7d32", background: "#e8f5e9", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="px-4 py-3 rounded-lg text-sm" style={{ color: "var(--moss)", backgroundColor: "var(--moss-bg)" }}>
           Password changed.
         </p>
       )}
-      <label>
-        Current Password
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Current Password</div>
         <input
           type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
           autoComplete="current-password"
           required
-          style={fieldStyle}
+          className={inputClass}
+          style={inputStyle}
         />
-      </label>
-      <label>
-        New Password
+      </div>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>New Password</div>
         <input
           type="password"
           value={newPassword}
@@ -74,11 +76,12 @@ export default function ChangePasswordForm() {
           autoComplete="new-password"
           required
           minLength={8}
-          style={fieldStyle}
+          className={inputClass}
+          style={inputStyle}
         />
-      </label>
-      <label>
-        Confirm New Password
+      </div>
+      <div>
+        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>Confirm New Password</div>
         <input
           type="password"
           value={confirmPassword}
@@ -86,10 +89,11 @@ export default function ChangePasswordForm() {
           autoComplete="new-password"
           required
           minLength={8}
-          style={fieldStyle}
+          className={inputClass}
+          style={inputStyle}
         />
-      </label>
-      <button type="submit" className="btn btn-primary" disabled={busy} style={{ alignSelf: "flex-start" }}>
+      </div>
+      <button type="submit" disabled={busy} className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
         {busy ? "Saving..." : "Change Password"}
       </button>
     </form>

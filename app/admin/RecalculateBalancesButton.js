@@ -22,11 +22,11 @@ export default function RecalculateBalancesButton() {
 
   return (
     <div>
-      <button type="button" className="btn btn-primary" disabled={busy} onClick={run}>
+      <button type="button" disabled={busy} onClick={run} className="btn btn-primary">
         {busy ? "Recalculating..." : "Recalculate Balances"}
       </button>
-      {result?.error && <p style={{ color: "#c62828" }}>{result.error}</p>}
-      {result?.ok && <p style={{ color: "#2e7d32" }}>Done — {result.customerCount} customer(s) reconciled.</p>}
+      {result?.error && <p className="text-sm mt-2" style={{ color: "var(--rust)" }}>{result.error}</p>}
+      {result?.ok && <p className="text-sm mt-2" style={{ color: "var(--moss)" }}>Done — {result.customerCount} customer(s) reconciled.</p>}
     </div>
   );
 }

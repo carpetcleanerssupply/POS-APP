@@ -10,9 +10,6 @@ import DocumentLetterhead from "../../../DocumentLetterhead";
 import PrintButton from "../../../PrintButton";
 import EmailButton from "../../../EmailButton";
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
-
 export const dynamic = "force-dynamic";
 
 export default async function CustomerStatementPage({ params }) {
@@ -62,55 +59,59 @@ export default async function CustomerStatementPage({ params }) {
   });
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 800 }}>
-      <p className="no-print"><Link href={`/customers/${id}/edit`}>&larr; Back to {name}</Link></p>
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="no-print mb-3">
+        <Link href={`/customers?selected=${id}`} className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to {name}</Link>
+      </p>
 
       <DocumentLetterhead />
 
-      <h1>Account Statement — {name}</h1>
-      <p>
+      <h1 className="text-2xl font-semibold mt-4" style={{ color: "var(--deep)" }}>Account Statement — {name}</h1>
+      <p className="text-sm mt-2">
         Current Balance:{" "}
-        <strong style={{ color: Number(customer.balance) > 0 ? "#c62828" : "#2e7d32" }}>
+        <strong className="mono" style={{ color: Number(customer.balance) > 0 ? "var(--rust)" : "var(--moss)" }}>
           ${Number(customer.balance).toFixed(2)}
         </strong>
       </p>
 
-      <p className="no-print" style={{ display: "flex", gap: "1rem" }}>
+      <p className="no-print flex gap-4 mt-4">
         <PrintButton />
         <EmailButton mailtoUrl={emailMailto} />
       </p>
 
       {ledger.length === 0 ? (
-        <p style={{ color: "#777" }}>No activity on this account yet.</p>
+        <p className="text-sm mt-4" style={{ color: "var(--faint)" }}>No activity on this account yet.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={th}>Date</th>
-              <th style={th}>Description</th>
-              <th style={{ ...th, textAlign: "right" }}>Amount</th>
-              <th style={{ ...th, textAlign: "right" }}>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ledger.map((e) => (
-              <tr key={e.key}>
-                <td style={td}>{new Date(e.date).toLocaleDateString()}</td>
-                <td style={td}>{e.description}</td>
-                <td style={{ ...td, textAlign: "right" }}>
-                  {e.displayAmount != null
-                    ? `$${e.displayAmount.toFixed(2)} (no balance impact)`
-                    : e.amount === 0
-                    ? "—"
-                    : e.amount > 0
-                    ? `$${e.amount.toFixed(2)}`
-                    : `-$${Math.abs(e.amount).toFixed(2)}`}
-                </td>
-                <td style={{ ...td, textAlign: "right" }}>${e.balance.toFixed(2)}</td>
+        <div className="card overflow-hidden mt-4">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: "var(--paper)" }}>
+                <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Date</th>
+                <th className="px-3 py-2 text-left font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Description</th>
+                <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Amount</th>
+                <th className="px-3 py-2 text-right font-medium text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Balance</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {ledger.map((e) => (
+                <tr key={e.key}>
+                  <td className="px-3 py-2 border-t hairline" style={{ color: "var(--faint)" }}>{new Date(e.date).toLocaleDateString()}</td>
+                  <td className="px-3 py-2 border-t hairline">{e.description}</td>
+                  <td className="px-3 py-2 border-t hairline text-right mono">
+                    {e.displayAmount != null
+                      ? `$${e.displayAmount.toFixed(2)} (no balance impact)`
+                      : e.amount === 0
+                      ? "—"
+                      : e.amount > 0
+                      ? `$${e.amount.toFixed(2)}`
+                      : `-$${Math.abs(e.amount).toFixed(2)}`}
+                  </td>
+                  <td className="px-3 py-2 border-t hairline text-right mono">${e.balance.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );
