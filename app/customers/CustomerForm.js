@@ -1,155 +1,145 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { US_STATES } from "@/lib/us-states";
 
 const ERROR_MESSAGES = {
   required: "Enter a company name or a contact name.",
 };
 
-const fieldStyle = { display: "block", width: "100%", padding: "0.5rem", marginTop: "0.25rem" };
-const rowStyle = { display: "flex", gap: "1rem" };
-const labelStyle = { flex: 1, fontSize: "0.9rem" };
-const sectionStyle = { marginTop: "1.5rem", marginBottom: "0.5rem", fontSize: "1rem", fontWeight: 600 };
+function Field({ label, children }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--faint)" }}>{label}</div>
+      {children}
+    </div>
+  );
+}
 
-export default function CustomerForm({ action, customer, error, saved, submitLabel }) {
-  const v = (key, fallback = "") => customer?.[key] ?? fallback;
+const inputClass = "w-full px-3 py-2 rounded border text-sm focus-amber hairline disabled:cursor-not-allowed";
+function inputStyle(disabled) {
+  return { backgroundColor: disabled ? "var(--paper)" : "var(--panel)", color: disabled ? "var(--faint)" : "var(--ink)" };
+}
+
+function AddressFields({ prefix, draft, onChange, disabled }) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <div className="col-span-2">
+        <input name={`${prefix}Street`} value={draft[`${prefix}Street`] || ""} onChange={(e) => onChange(`${prefix}Street`, e.target.value)} disabled={disabled} placeholder="Street address" className={inputClass} style={inputStyle(disabled)} />
+      </div>
+      <div className="col-span-2">
+        <input name={`${prefix}Street2`} value={draft[`${prefix}Street2`] || ""} onChange={(e) => onChange(`${prefix}Street2`, e.target.value)} disabled={disabled} placeholder="Apt, suite, unit (optional)" className={inputClass} style={inputStyle(disabled)} />
+      </div>
+      <input name={`${prefix}City`} value={draft[`${prefix}City`] || ""} onChange={(e) => onChange(`${prefix}City`, e.target.value)} disabled={disabled} placeholder="City" className={inputClass} style={inputStyle(disabled)} />
+      <div className="grid grid-cols-2 gap-2">
+        <select name={`${prefix}State`} value={draft[`${prefix}State`] || ""} onChange={(e) => onChange(`${prefix}State`, e.target.value)} disabled={disabled} className={inputClass} style={inputStyle(disabled)}>
+          <option value="">State</option>
+          {US_STATES.map(([code, name]) => (
+            <option key={code} value={code}>{code} — {name}</option>
+          ))}
+        </select>
+        <input name={`${prefix}Zip`} value={draft[`${prefix}Zip`] || ""} onChange={(e) => onChange(`${prefix}Zip`, e.target.value)} disabled={disabled} placeholder="ZIP" className={inputClass} style={inputStyle(disabled)} />
+      </div>
+    </div>
+  );
+}
+
+const BLANK = {
+  company: "", firstName: "", lastName: "", workPhone: "", cellPhone: "", email: "", email2: "",
+  unsubscribed: false, webCustomer: false,
+  billingStreet: "", billingStreet2: "", billingCity: "", billingState: "", billingZip: "",
+  shippingStreet: "", shippingStreet2: "", shippingCity: "", shippingState: "", shippingZip: "",
+  shipSameAsBilling: true, taxExempt: false, resaleCert: "",
+};
+
+export default function CustomerForm({ action, error }) {
+  const [draft, setDraft] = useState(BLANK);
+  const set = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
 
   return (
-    <div style={{ maxWidth: 640 }}>
+    <div className="card p-5" style={{ maxWidth: 760 }}>
       {error && ERROR_MESSAGES[error] && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>
           {ERROR_MESSAGES[error]}
         </p>
       )}
-      {saved && (
-        <p style={{ color: "#2e7d32", background: "#e8f5e9", padding: "0.75rem 1rem", borderRadius: 8 }}>
-          Customer saved.
-        </p>
-      )}
 
-      {customer && (
-        <p style={{ color: "#555" }}>
-          Balance: <strong>${Number(customer.balance).toFixed(2)}</strong>{" "}
-          <Link href={`/payments/new?customerId=${customer.id}`}>Record Payment</Link>{" "}
-          &middot; <Link href={`/customers/${customer.id}/statement`}>Account Statement</Link>
-        </p>
-      )}
-
-      <form action={action} method="POST" style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Company
-            <input name="company" defaultValue={v("company")} style={fieldStyle} />
-          </label>
-        </div>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            First Name
-            <input name="firstName" defaultValue={v("firstName")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Last Name
-            <input name="lastName" defaultValue={v("lastName")} style={fieldStyle} />
-          </label>
-        </div>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Work Phone
-            <input name="workPhone" defaultValue={v("workPhone")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Cell Phone
-            <input name="cellPhone" defaultValue={v("cellPhone")} style={fieldStyle} />
-          </label>
-        </div>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            Email
-            <input name="email" type="email" defaultValue={v("email")} style={fieldStyle} />
-          </label>
-          <label style={labelStyle}>
-            Email 2
-            <input name="email2" type="email" defaultValue={v("email2")} style={fieldStyle} />
-          </label>
-        </div>
-        <label>
-          <input type="checkbox" name="unsubscribed" defaultChecked={v("unsubscribed", false)} /> Unsubscribed from
-          email
-        </label>
-        <label>
-          <input type="checkbox" name="webCustomer" defaultChecked={v("webCustomer", false)} /> Web Customer
-        </label>
-
-        <div style={sectionStyle}>Billing Address</div>
-        <label>
-          Street
-          <input name="billingStreet" defaultValue={v("billingStreet")} style={fieldStyle} />
-        </label>
-        <label>
-          Street 2
-          <input name="billingStreet2" defaultValue={v("billingStreet2")} style={fieldStyle} />
-        </label>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            City
-            <input name="billingCity" defaultValue={v("billingCity")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            State
-            <input name="billingState" defaultValue={v("billingState")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            Zip
-            <input name="billingZip" defaultValue={v("billingZip")} style={fieldStyle} />
-          </label>
+      <form action={action} method="POST" className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Field label="Company">
+            <input name="company" value={draft.company} onChange={(e) => set("company", e.target.value)} className={inputClass} style={inputStyle(false)} />
+          </Field>
+          <Field label="Web Customer">
+            <label className="flex items-center gap-2 text-sm py-2">
+              <input type="checkbox" name="webCustomer" checked={draft.webCustomer} onChange={(e) => set("webCustomer", e.target.checked)} />
+              Web customer
+            </label>
+          </Field>
+          <Field label="First Name">
+            <input name="firstName" value={draft.firstName} onChange={(e) => set("firstName", e.target.value)} className={inputClass} style={inputStyle(false)} />
+          </Field>
+          <Field label="Last Name">
+            <input name="lastName" value={draft.lastName} onChange={(e) => set("lastName", e.target.value)} className={inputClass} style={inputStyle(false)} />
+          </Field>
+          <Field label="Email">
+            <div className="flex items-center gap-2">
+              <input name="email" type="email" value={draft.email} onChange={(e) => set("email", e.target.value)} className={inputClass} style={inputStyle(false)} />
+              <label className="flex items-center gap-1 text-xs whitespace-nowrap flex-shrink-0" style={{ color: "var(--faint)" }}>
+                <input type="checkbox" name="unsubscribed" checked={draft.unsubscribed} onChange={(e) => set("unsubscribed", e.target.checked)} /> Unsubscribed
+              </label>
+            </div>
+          </Field>
+          <Field label="Secondary Email">
+            <input name="email2" type="email" value={draft.email2} onChange={(e) => set("email2", e.target.value)} placeholder="optional" className={inputClass} style={inputStyle(false)} />
+          </Field>
+          <Field label="Work Phone">
+            <input name="workPhone" value={draft.workPhone} onChange={(e) => set("workPhone", e.target.value)} className={inputClass} style={inputStyle(false)} />
+          </Field>
+          <Field label="Cell Phone">
+            <input name="cellPhone" value={draft.cellPhone} onChange={(e) => set("cellPhone", e.target.value)} className={inputClass} style={inputStyle(false)} />
+          </Field>
         </div>
 
-        <div style={sectionStyle}>Shipping Address</div>
-        <label>
-          <input type="checkbox" name="shipSameAsBilling" defaultChecked={v("shipSameAsBilling", true)} /> Same as
-          billing address
-        </label>
-        <label>
-          Street
-          <input name="shippingStreet" defaultValue={v("shippingStreet")} style={fieldStyle} />
-        </label>
-        <label>
-          Street 2
-          <input name="shippingStreet2" defaultValue={v("shippingStreet2")} style={fieldStyle} />
-        </label>
-        <div style={rowStyle}>
-          <label style={labelStyle}>
-            City
-            <input name="shippingCity" defaultValue={v("shippingCity")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            State
-            <input name="shippingState" defaultValue={v("shippingState")} style={fieldStyle} />
-          </label>
-          <label style={{ ...labelStyle, flex: 0.5 }}>
-            Zip
-            <input name="shippingZip" defaultValue={v("shippingZip")} style={fieldStyle} />
-          </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Field label="Billing Address">
+            <AddressFields prefix="billing" draft={draft} onChange={set} disabled={false} />
+          </Field>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Shipping Address</div>
+              <label className="flex items-center gap-1.5 text-xs" style={{ color: "var(--faint)" }}>
+                <input type="checkbox" name="shipSameAsBilling" checked={draft.shipSameAsBilling} onChange={(e) => set("shipSameAsBilling", e.target.checked)} /> Same as billing
+              </label>
+            </div>
+            <AddressFields
+              prefix="shipping"
+              draft={draft.shipSameAsBilling ? {
+                shippingStreet: draft.billingStreet, shippingStreet2: draft.billingStreet2,
+                shippingCity: draft.billingCity, shippingState: draft.billingState, shippingZip: draft.billingZip,
+              } : draft}
+              onChange={set}
+              disabled={draft.shipSameAsBilling}
+            />
+          </div>
         </div>
-        <p style={{ fontSize: "0.8rem", color: "#777", marginTop: "-0.5rem" }}>
-          If &quot;Same as billing address&quot; is checked, the shipping fields above are ignored and the billing address is
-          used instead.
-        </p>
 
-        <div style={sectionStyle}>Tax</div>
-        <label>
-          <input type="checkbox" name="taxExempt" defaultChecked={v("taxExempt", false)} /> Tax exempt
-        </label>
-        <label>
-          Resale Certificate #
-          <input name="resaleCert" defaultValue={v("resaleCert")} style={fieldStyle} />
-        </label>
+        <div className="pt-3 border-t hairline flex flex-col md:flex-row md:items-center gap-3 justify-between">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="taxExempt" checked={draft.taxExempt} onChange={(e) => set("taxExempt", e.target.checked)} />
+            Tax-Exempt / Resale Customer
+          </label>
+          {draft.taxExempt && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>Resale Cert #</label>
+              <input name="resaleCert" value={draft.resaleCert} onChange={(e) => set("resaleCert", e.target.value)} placeholder="certificate number" className={inputClass} style={{ ...inputStyle(false), width: 200 }} />
+            </div>
+          )}
+        </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          <button type="submit" className="btn btn-primary">
-            {submitLabel}
-          </button>
-          <Link href="/customers" className="btn">
-            Cancel
-          </Link>
+        <div className="flex gap-3 pt-2">
+          <button type="submit" className="btn btn-primary">Add Customer</button>
+          <Link href="/customers" className="btn">Cancel</Link>
         </div>
       </form>
     </div>

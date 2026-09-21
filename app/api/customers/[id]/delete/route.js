@@ -16,11 +16,11 @@ export async function POST(request, { params }) {
 
   const usage = await customerUsage(prisma, customer);
   if (usage.hasBalance) {
-    return NextResponse.redirect(`${origin}/customers?error=has_balance`, { status: 303 });
+    return NextResponse.redirect(`${origin}/customers?selected=${id}&error=has_balance`, { status: 303 });
   }
   if (usage.invoiceCount > 0 || usage.estimateCount > 0) {
     return NextResponse.redirect(
-      `${origin}/customers?error=has_history&invoices=${usage.invoiceCount}&estimates=${usage.estimateCount}`,
+      `${origin}/customers?selected=${id}&error=has_history&invoices=${usage.invoiceCount}&estimates=${usage.estimateCount}`,
       { status: 303 }
     );
   }

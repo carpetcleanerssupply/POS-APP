@@ -15,5 +15,5 @@ export async function POST(request) {
   }
 
   const customer = await prisma.customer.create({ data });
-  return NextResponse.redirect(`${origin}/customers/${customer.id}/edit`, { status: 303 });
+  return NextResponse.redirect(`${origin}/customers?selected=${customer.id}`, { status: 303 });
 }

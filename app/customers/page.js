@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
-import { displayName } from "@/lib/customers";
-import DeleteCustomerButton from "./DeleteCustomerButton";
+import { displayName, contactName } from "@/lib/customers";
+import { buildStatementLedger } from "@/lib/statement";
+import CustomerSearchList from "./CustomerSearchList";
+import CustomerDetailCard from "./CustomerDetailCard";
 
 const DELETE_ERROR_MESSAGES = {
   has_balance: () => "Can't delete — this customer has a balance on their account. Settle it first before deleting.",
@@ -11,116 +13,158 @@ const DELETE_ERROR_MESSAGES = {
   not_found: () => "That customer no longer exists.",
 };
 
-const th = { textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: "2px solid #ddd", fontSize: "0.85rem" };
-const td = { padding: "0.5rem 0.75rem", borderBottom: "1px solid #eee" };
+function serializeCustomer(c) {
+  return { ...c, balance: Number(c.balance) };
+}
+
+function isFormError(error) {
+  return error === "required";
+}
 
 export default async function CustomersPage({ searchParams }) {
   await requireSession();
   const params = await searchParams;
-  const q = (params?.q || "").trim().toLowerCase();
+  const selectedId = params?.selected || null;
 
-  const dueOnly = params?.due === "1";
   const allCustomers = await prisma.customer.findMany({ orderBy: [{ company: "asc" }, { lastName: "asc" }] });
 
-  const matchesQuery = (c) =>
-    !q ||
-    displayName(c).toLowerCase().includes(q) ||
-    (c.email || "").toLowerCase().includes(q) ||
-    (c.workPhone || "").includes(q) ||
-    (c.cellPhone || "").includes(q);
-
-  const owingCustomers = allCustomers.filter((c) => Number(c.balance) > 0.005).sort((a, b) => Number(b.balance) - Number(a.balance));
-  const totalOwed = owingCustomers.reduce((sum, c) => sum + Number(c.balance), 0);
-
-  const customers = (dueOnly ? owingCustomers : allCustomers).filter(matchesQuery);
+  const searchList = allCustomers.map((c) => ({
+    id: c.id,
+    name: displayName(c),
+    subtitle: (c.company && contactName(c)) ? contactName(c) : (c.workPhone || c.cellPhone || c.email || "No contact info"),
+    balance: Number(c.balance),
+    searchText: [displayName(c), c.email, c.workPhone, c.cellPhone].filter(Boolean).join(" ").toLowerCase(),
+  }));
 
   const errorMessage = params?.error && DELETE_ERROR_MESSAGES[params.error]?.(params);
 
-  return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 960 }}>
-      <p><Link href="/">&larr; Home</Link></p>
+  const selectedRaw = selectedId ? allCustomers.find((c) => c.id === selectedId) : null;
+  const selectedCustomer = selectedRaw ? serializeCustomer(selectedRaw) : null;
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
-        <h1>Customers</h1>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-          <Link href="/api/customers/export" className="btn btn-sm">Export CSV</Link>
-          <Link href="/api/customers/mailing-list" className="btn btn-sm">Export Mailing List</Link>
-          <Link href="/customers/import" className="btn btn-sm">Import CSV</Link>
-          <Link href="/customers/new" style={{ padding: "0.55rem 1rem", background: "#1e3a5f", color: "#fff", borderRadius: 6, textDecoration: "none" }}>
-            + Add Customer
-          </Link>
+  let ledger = [];
+  if (selectedCustomer) {
+    const [invoices, payments, returns, estimates] = await Promise.all([
+      prisma.invoice.findMany({ where: { customerId: selectedId } }),
+      prisma.payment.findMany({ where: { customerId: selectedId }, include: { applications: true } }),
+      prisma.return.findMany({ where: { customerId: selectedId } }),
+      prisma.estimate.findMany({ where: { customerId: selectedId } }),
+    ]);
+    ledger = buildStatementLedger({ invoices, payments, returns, estimates });
+  }
+
+  return (
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Home</Link>
+      </p>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+        <div>
+          <div className="eyebrow mb-1">Customer Database</div>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>
+            Customers ({allCustomers.length})
+          </h1>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Link href="/api/customers/export" className="btn">Export CSV</Link>
+          <Link href="/api/customers/mailing-list" className="btn">Export Mailing List</Link>
+          <Link href="/customers/import" className="btn">Import CSV</Link>
+          <Link href="/customers/new" className="btn btn-primary">+ New Customer</Link>
         </div>
       </div>
 
       {errorMessage && (
-        <p style={{ color: "#c62828", background: "#ffebee", padding: "0.75rem 1rem", borderRadius: 8 }}>
+        <p className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ color: "var(--rust)", backgroundColor: "var(--rust-bg)" }}>
           {errorMessage}
         </p>
       )}
+      {params?.saved === "1" && (
+        <p className="mb-4 px-4 py-3 rounded-lg text-sm" style={{ color: "var(--moss)", backgroundColor: "var(--moss-bg)" }}>
+          Customer saved.
+        </p>
+      )}
 
-      <form method="GET" style={{ display: "flex", gap: "0.75rem", alignItems: "center", margin: "1.25rem 0" }}>
-        <input
-          type="text"
-          name="q"
-          defaultValue={params?.q || ""}
-          placeholder="Search name, company, phone, email..."
-          style={{ padding: "0.5rem", flex: 1, maxWidth: 320 }}
-        />
-        <button type="submit" className="btn btn-sm">Search</button>
-        {dueOnly && <input type="hidden" name="due" value="1" />}
-        <Link
-          href={dueOnly ? `/customers${q ? `?q=${encodeURIComponent(params.q)}` : ""}` : `/customers?due=1${q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
-          style={{
-            padding: "0.5rem 0.9rem",
-            borderRadius: 6,
-            border: "1px solid #c62828",
-            color: dueOnly ? "#fff" : "#c62828",
-            background: dueOnly ? "#c62828" : "transparent",
-            textDecoration: "none",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {dueOnly ? "Showing Statements Due" : `Statements Due (${owingCustomers.length}) — $${totalOwed.toFixed(2)}`}
-        </Link>
-      </form>
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
+        <CustomerSearchList customers={searchList} selectedId={selectedId} />
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={th}>Name</th>
-            <th style={th}>Phone</th>
-            <th style={th}>Email</th>
-            <th style={th}>Balance</th>
-            <th style={th}></th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((c) => (
-            <tr key={c.id}>
-              <td style={td}><Link href={`/customers/${c.id}/edit`}>{displayName(c)}</Link></td>
-              <td style={td}>{c.cellPhone || c.workPhone || "—"}</td>
-              <td style={td}>{c.email || "—"}</td>
-              <td style={td}>${Number(c.balance).toFixed(2)}</td>
-              <td style={{ ...td, display: "flex", gap: "0.75rem" }}>
-                <Link href={`/customers/${c.id}/edit`}>Edit</Link>
-                <Link href={`/customers/${c.id}/statement`}>Statement</Link>
-                <DeleteCustomerButton customerId={c.id} customerName={displayName(c)} />
-              </td>
-            </tr>
-          ))}
-          {customers.length === 0 && (
-            <tr>
-              <td style={td} colSpan={5}>
-                {allCustomers.length === 0
-                  ? "No customers yet."
-                  : dueOnly
-                  ? "Nobody currently owes a balance."
-                  : "No customers match your search."}
-              </td>
-            </tr>
+        <div>
+          {selectedCustomer ? (
+            <div className="flex flex-col gap-4">
+              <CustomerDetailCard
+                customer={selectedCustomer}
+                initialEditMode={params?.edit === "1"}
+                error={params?.error && isFormError(params.error) ? params.error : undefined}
+              />
+
+              <div className="card p-5">
+                <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
+                  <div className="eyebrow">Account History</div>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/customers/${selectedCustomer.id}/statement`} className="btn btn-sm">Print Statement</Link>
+                    <Link href={`/customers/${selectedCustomer.id}/statement`} className="btn btn-sm">Email Statement</Link>
+                    <Link href={`/payments/new?customerId=${selectedCustomer.id}`} className="btn btn-sm btn-primary">
+                      Record Payment →
+                    </Link>
+                  </div>
+                </div>
+
+                {ledger.length === 0 ? (
+                  <div className="text-sm" style={{ color: "var(--faint)" }}>No activity on file yet for this customer.</div>
+                ) : (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-xs uppercase tracking-wide" style={{ color: "var(--faint)" }}>
+                        <th className="pb-2 font-medium">Date</th>
+                        <th className="pb-2 font-medium">Description</th>
+                        <th className="pb-2 font-medium text-right">Amount</th>
+                        <th className="pb-2 font-medium text-right">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ledger.map((e) => (
+                        <tr key={e.key} className="border-t hairline">
+                          <td className="py-2 whitespace-nowrap" style={{ color: "var(--faint)" }}>
+                            {new Date(e.date).toLocaleDateString()}
+                          </td>
+                          <td className="py-2">{e.description}</td>
+                          <td
+                            className="py-2 text-right mono font-medium"
+                            style={{
+                              color:
+                                e.displayAmount != null
+                                  ? "var(--faint)"
+                                  : e.amount > 0
+                                  ? "var(--rust)"
+                                  : e.amount < 0
+                                  ? "var(--moss)"
+                                  : "var(--faint)",
+                            }}
+                          >
+                            {e.displayAmount != null
+                              ? `$${e.displayAmount.toFixed(2)}`
+                              : e.amount === 0
+                              ? "—"
+                              : e.amount > 0
+                              ? `$${e.amount.toFixed(2)}`
+                              : `-$${Math.abs(e.amount).toFixed(2)}`}
+                          </td>
+                          <td className="py-2 text-right mono" style={{ color: e.balance > 0.005 ? "var(--rust)" : "var(--moss)" }}>
+                            ${e.balance.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="card p-8 text-center text-sm" style={{ color: "var(--faint)" }}>
+              {allCustomers.length === 0 ? "No customers yet — add one to get started." : "Select a customer from the list."}
+            </div>
           )}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </main>
   );
 }
