@@ -12,14 +12,14 @@ export async function POST(request, { params }) {
   const data = parseVendorForm(form);
 
   if (!data.name) {
-    return NextResponse.redirect(`${origin}/vendors/${id}/edit?error=required`, { status: 303 });
+    return NextResponse.redirect(`${origin}/vendors?selected=${id}&edit=1&error=required`, { status: 303 });
   }
 
   try {
     await prisma.vendor.update({ where: { id }, data });
   } catch (error) {
     if (error.code === "P2002") {
-      return NextResponse.redirect(`${origin}/vendors/${id}/edit?error=duplicate_name`, { status: 303 });
+      return NextResponse.redirect(`${origin}/vendors?selected=${id}&edit=1&error=duplicate_name`, { status: 303 });
     }
     if (error.code === "P2025") {
       return NextResponse.redirect(`${origin}/vendors?error=not_found`, { status: 303 });
@@ -27,5 +27,5 @@ export async function POST(request, { params }) {
     throw error;
   }
 
-  return NextResponse.redirect(`${origin}/vendors`, { status: 303 });
+  return NextResponse.redirect(`${origin}/vendors?selected=${id}&saved=1`, { status: 303 });
 }

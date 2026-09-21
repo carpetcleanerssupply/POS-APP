@@ -7,10 +7,15 @@ export default async function NewVendorPage({ searchParams }) {
   const params = await searchParams;
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "3rem", maxWidth: 640 }}>
-      <p><Link href="/vendors">&larr; Back to Vendors</Link></p>
-      <h1>Add Vendor</h1>
-      <VendorForm action="/api/vendors" error={params?.error} submitLabel="Add Vendor" />
+    <main className="p-6 md:p-10" style={{ maxWidth: 1600, margin: "0 auto" }}>
+      <p className="mb-3">
+        <Link href="/vendors" className="text-sm" style={{ color: "var(--faint)" }}>&larr; Back to Vendors</Link>
+      </p>
+      <div className="mb-5">
+        <div className="eyebrow mb-1">Vendor Database</div>
+        <h1 className="text-2xl font-semibold" style={{ color: "var(--deep)" }}>Add Vendor</h1>
+      </div>
+      <VendorForm action="/api/vendors" error={params?.error} />
     </main>
   );
 }
