@@ -102,17 +102,17 @@ export default function ItemsTable({ items }) {
 
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
         <colgroup>
-          <col style={{ width: "9%" }} />
-          <col style={{ width: "22%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "6%" }} />
           <col style={{ width: "8%" }} />
+          <col style={{ width: "30%" }} />
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "6%" }} />
+          <col style={{ width: "6%" }} />
+          <col style={{ width: "5%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "6%" }} />
-          <col style={{ width: "7%" }} />
+          <col style={{ width: "5%" }} />
+          <col style={{ width: "8%" }} />
         </colgroup>
         <thead>
           <tr>
